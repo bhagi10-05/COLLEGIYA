@@ -1,0 +1,152 @@
+/* ========================================
+   COLLEGIYA LOADER
+   ======================================== */
+
+.loader-wrapper {
+  width: 100%;
+
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  color: var(--text-secondary);
+}
+
+
+/* ========================================
+   FULL SCREEN
+   ======================================== */
+
+.loader-fullscreen {
+  min-height: 100vh;
+
+  position: fixed;
+  inset: 0;
+
+  z-index: var(--z-modal);
+
+  background: var(--surface);
+}
+
+
+/* ========================================
+   SPINNER
+   ======================================== */
+
+.loader-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+}
+
+.loader-spinner span {
+  display: block;
+
+  width: 8px;
+  height: 8px;
+
+  background: var(--primary);
+
+  border-radius: 50%;
+
+  animation: collegiya-loader 1s infinite ease-in-out;
+}
+
+.loader-spinner span:nth-child(1) {
+  animation-delay: -0.24s;
+}
+
+.loader-spinner span:nth-child(2) {
+  animation-delay: -0.12s;
+}
+
+.loader-spinner span:nth-child(3) {
+  animation-delay: 0;
+}
+
+
+/* ========================================
+   TEXT
+   ======================================== */
+
+.loader-text {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* ========================================
+   SIZES
+   ======================================== */
+
+.loader-small .loader-spinner span {
+  width: 6px;
+  height: 6px;
+}
+
+.loader-medium .loader-spinner span {
+  width: 8px;
+  height: 8px;
+}
+
+.loader-large .loader-spinner span {
+  width: 11px;
+  height: 11px;
+}
+
+
+/* ========================================
+   ANIMATION
+   ======================================== */
+
+@keyframes collegiya-loader {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* ========================================
+   MOBILE
+   ======================================== */
+
+@media (max-width: 480px) {
+  .loader-wrapper {
+    min-height: 150px;
+  }
+
+  .loader-text {
+    font-size: 13px;
+  }
+}
+
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-spinner span {
+    animation: none;
+    opacity: 1;
+  }
+}

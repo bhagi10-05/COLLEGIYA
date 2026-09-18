@@ -1,0 +1,797 @@
+.notification-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 28px 28px 50px;
+  background: #f6f8fc;
+}
+
+.notification-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.notification-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 40px;
+  padding: 0 15px;
+
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color: #ffffff;
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow:
+    0 6px 16px rgba(37, 99, 235, 0.2);
+
+  transition: 0.2s ease;
+}
+
+.notification-back:hover {
+  transform: translateY(-1px);
+}
+
+.notification-back span {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+/* =========================
+   NOTICE BOARD
+========================= */
+
+.notice-board-heading {
+  margin: 22px 0 25px;
+  text-align: center;
+}
+
+.notice-board-line {
+  width: 60px;
+  height: 3px;
+
+  margin: 9px auto;
+
+  border-radius: 50px;
+
+  background: #2563eb;
+}
+
+.notice-board-heading h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 30px;
+  font-weight: 900;
+
+  letter-spacing: 1.5px;
+}
+
+.notice-board-heading p {
+  margin: 7px 0 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+/* =========================
+   FILTER
+========================= */
+
+.notification-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 13px;
+}
+
+.notification-tabs {
+  display: inline-flex;
+
+  padding: 3px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.notification-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  min-height: 35px;
+
+  padding: 0 14px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.notification-tab b {
+  min-width: 20px;
+  height: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  font-size: 9px;
+}
+
+.notification-tab.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.notification-tab.active b {
+  background: rgba(255,255,255,0.2);
+  color: #ffffff;
+}
+
+.notification-status {
+  color: #94a3b8;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =========================
+   LIST
+========================= */
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.notification-card {
+  position: relative;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 13px;
+
+  padding: 15px 44px 14px 15px;
+
+  border: 1px solid #e6ebf2;
+  border-radius: 13px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.03);
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.notification-card:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.notification-card.unread {
+  border-left: 4px solid #2563eb;
+  background: #fbfdff;
+}
+
+/* =========================
+   ICON
+========================= */
+
+.notification-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.notification-icon.course {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.notification-icon.quiz {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.notification-icon.college {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+.notification-icon.certificate {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.notification-icon.system {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.notification-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-card-top {
+  display: flex;
+  justify-content: space-between;
+
+  gap: 15px;
+}
+
+.notification-type {
+  margin-bottom: 3px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.notification-title-line {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.notification-title-line h3 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 14px;
+  line-height: 1.3;
+
+  font-weight: 800;
+}
+
+.unread-dot {
+  width: 6px;
+  height: 6px;
+
+  flex: 0 0 6px;
+
+  border-radius: 50%;
+
+  background: #2563eb;
+}
+
+.notification-time {
+  flex: 0 0 auto;
+
+  padding-top: 1px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ==================================================
+   SMALL DESCRIPTION BOX
+
+   FIRST LINE = FULL
+   SECOND LINE = HALF + READ MORE
+================================================== */
+
+.notification-preview {
+  position: relative;
+
+  width: 100%;
+  max-width: 700px;
+
+  height: 38px;
+
+  margin-top: 6px;
+
+  overflow: hidden;
+
+  font-size: 12px;
+  line-height: 19px;
+}
+
+/* MESSAGE */
+
+.preview-text {
+  width: 100%;
+  height: 38px;
+
+  overflow: hidden;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 19px;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* ==================================================
+   READ MORE
+   FIXED ON SECOND LINE
+================================================== */
+
+.notification-preview .read-more-button {
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+
+  z-index: 10;
+
+  height: 19px;
+
+  display: flex;
+  align-items: center;
+
+  margin: 0;
+
+  padding: 0 0 0 8px;
+
+  border: 0;
+
+  background: #ffffff;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  line-height: 19px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+}
+
+/* FADE BEFORE READ MORE */
+
+.notification-preview
+.read-more-button::before {
+  content: "";
+
+  position: absolute;
+
+  right: 100%;
+  top: 0;
+
+  width: 35px;
+  height: 19px;
+
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0),
+    #ffffff
+  );
+}
+
+/* UNREAD CARD */
+
+.notification-card.unread
+.notification-preview
+.read-more-button {
+  background: #fbfdff;
+}
+
+.notification-card.unread
+.notification-preview
+.read-more-button::before {
+  background: linear-gradient(
+    to right,
+    rgba(251,253,255,0),
+    #fbfdff
+  );
+}
+
+.notification-preview
+.read-more-button:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* =========================
+   EXPANDED
+========================= */
+
+.notification-expanded {
+  width: 100%;
+  max-width: 700px;
+
+  margin-top: 6px;
+}
+
+.notification-full-message {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.notification-expanded
+.read-more-button {
+  display: inline-block;
+
+  margin: 4px 0 5px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.notification-expanded
+.read-more-button:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   ACTION
+========================= */
+
+.notification-card-actions {
+  min-height: 18px;
+
+  display: flex;
+  align-items: center;
+}
+
+.read-btn {
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.read-btn:hover {
+  text-decoration: underline;
+}
+
+.read-status {
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =========================
+   DELETE
+========================= */
+
+.delete-notification {
+  position: absolute;
+
+  top: 12px;
+  right: 12px;
+
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #94a3b8;
+
+  font-size: 19px;
+
+  cursor: pointer;
+}
+
+.delete-notification:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.notification-empty {
+  padding: 55px 20px;
+
+  border: 1px solid #e6ebf2;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  text-align: center;
+}
+
+.empty-icon {
+  width: 55px;
+  height: 55px;
+
+  margin: 0 auto 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ecfdf5;
+
+  color: #059669;
+
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.notification-empty h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 20px;
+}
+
+.notification-empty p {
+  margin: 7px 0 16px;
+
+  color: #64748b;
+
+  font-size: 12px;
+}
+
+.empty-action {
+  min-height: 38px;
+
+  padding: 0 15px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: #2563eb;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
+  .notification-page {
+    padding: 25px 20px 45px;
+  }
+
+  .notice-board-heading h1 {
+    font-size: 28px;
+  }
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+  .notification-page {
+    padding: 20px 12px 85px;
+  }
+
+  .notice-board-heading {
+    margin: 20px 0 22px;
+  }
+
+  .notice-board-heading h1 {
+    font-size: 24px;
+  }
+
+  .notice-board-heading p {
+    font-size: 11px;
+  }
+
+  .notification-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notification-card {
+    gap: 10px;
+
+    padding: 13px 38px 12px 12px;
+
+    border-radius: 12px;
+  }
+
+  .notification-icon {
+    width: 39px;
+    height: 39px;
+
+    flex-basis: 39px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+  }
+
+  .notification-card-top {
+    display: block;
+  }
+
+  .notification-time {
+    display: block;
+
+    margin-top: 4px;
+  }
+
+  .notification-title-line h3 {
+    font-size: 13px;
+  }
+
+  /* SMALL MOBILE DESCRIPTION */
+
+  .notification-preview {
+    height: 34px;
+
+    margin-top: 5px;
+  }
+
+  .preview-text {
+    height: 34px;
+
+    font-size: 11px;
+    line-height: 17px;
+  }
+
+  .notification-preview
+  .read-more-button {
+    height: 17px;
+
+    font-size: 10px;
+    line-height: 17px;
+  }
+
+  .notification-preview
+  .read-more-button::before {
+    height: 17px;
+  }
+
+  .notification-full-message {
+    font-size: 11px;
+  }
+
+  .delete-notification {
+    top: 9px;
+    right: 8px;
+  }
+
+}
+
+/* =========================
+   SMALL MOBILE
+========================= */
+
+@media (max-width: 380px) {
+
+  .notification-page {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .notice-board-heading h1 {
+    font-size: 21px;
+  }
+
+  .notification-card {
+    gap: 8px;
+  }
+
+  .notification-icon {
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+
+    font-size: 13px;
+  }
+
+  .notification-title-line h3 {
+    font-size: 12px;
+  }
+
+}
