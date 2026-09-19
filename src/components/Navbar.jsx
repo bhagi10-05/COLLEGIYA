@@ -272,15 +272,14 @@ function Navbar() {
               Student Portal
             </Link>
 
-            <Link
-              to="/teacher/dashboard"
-              onClick={closeMenu}
-              className="col-slide-link"
-            >
-              <span>👨‍🏫</span>
-              Teacher Portal
-            </Link>
-
+              <Link
+                to="/teacher/dashboard"
+                onClick={closeMenu}
+                className="col-slide-link"
+              >
+                <span>👨‍🏫</span>
+                Teacher Portal
+              </Link>
             <Link
               to="/college/dashboard"
               onClick={closeMenu}

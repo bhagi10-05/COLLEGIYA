@@ -12,11 +12,6 @@ import MainLayout from "./layouts/MainLayout";
 import StudentLayout from "./layouts/StudentLayout";
 
 /* =========================
-   TEACHER LAYOUT
-========================= */
-import TeacherLayout from "./layouts/TeacherLayout";
-
-/* =========================
    PUBLIC PAGES
 ========================= */
 import Home from "./pages/Home";
@@ -37,18 +32,54 @@ import StudentProfile from "./student/Profile";
 import StudentCertificate from "./student/Certificate";
 
 /* =========================
-   TEACHER PAGES
+   TEACHER MODULE
 ========================= */
-import TeacherDashboard from "./teacher/Dashboard";
-import TeacherCourses from "./teacher/Courses";
+import TeacherLayout from "./teacher/layouts/TeacherLayout";
+import TeacherLogin from "./teacher/pages/TeacherLogin";
+import TeacherDashboard from "./teacher/pages/TeacherDashboard";
+
+
+/* ==================================================
+   TEACHER PLACEHOLDER
+================================================== */
+
+function TeacherComingSoon({ title }) {
+  return (
+    <div
+      style={{
+        background: "#ffffff",
+        border: "1px solid #e8ebf2",
+        borderRadius: "18px",
+        padding: "40px",
+        minHeight: "300px",
+      }}
+    >
+      <h1>{title}</h1>
+
+      <p
+        style={{
+          color: "#747b8c",
+          marginTop: "10px",
+        }}
+      >
+        This Teacher Module is coming soon.
+      </p>
+    </div>
+  );
+}
+
+
+/* ==================================================
+   APP ROUTES
+================================================== */
 
 export default function App() {
   return (
     <Routes>
 
-      {/* ==========================================
+      {/* ==============================================
           PUBLIC COLLEGIYA WEBSITE
-      ========================================== */}
+      ============================================== */}
 
       <Route element={<MainLayout />}>
 
@@ -80,9 +111,9 @@ export default function App() {
       </Route>
 
 
-      {/* ==========================================
+      {/* ==============================================
           STUDENT PORTAL
-      ========================================== */}
+      ============================================== */}
 
       <Route
         path="/student"
@@ -152,9 +183,21 @@ export default function App() {
       </Route>
 
 
-      {/* ==========================================
+      {/* ==============================================
+          TEACHER LOGIN
+          Separate from Teacher Layout
+      ============================================== */}
+
+      <Route
+        path="/teacher/login"
+        element={<TeacherLogin />}
+      />
+
+
+      {/* ==============================================
           TEACHER PORTAL
-      ========================================== */}
+          COMPLETELY SEPARATE MODULE
+      ============================================== */}
 
       <Route
         path="/teacher"
@@ -176,7 +219,49 @@ export default function App() {
         {/* /teacher/courses */}
         <Route
           path="courses"
-          element={<TeacherCourses />}
+          element={
+            <TeacherComingSoon title="My Courses" />
+          }
+        />
+
+        {/* /teacher/students */}
+        <Route
+          path="students"
+          element={
+            <TeacherComingSoon title="Students" />
+          }
+        />
+
+        {/* /teacher/tests */}
+        <Route
+          path="tests"
+          element={
+            <TeacherComingSoon title="Tests" />
+          }
+        />
+
+        {/* /teacher/content */}
+        <Route
+          path="content"
+          element={
+            <TeacherComingSoon title="Content" />
+          }
+        />
+
+        {/* /teacher/analytics */}
+        <Route
+          path="analytics"
+          element={
+            <TeacherComingSoon title="Analytics" />
+          }
+        />
+
+        {/* /teacher/earnings */}
+        <Route
+          path="earnings"
+          element={
+            <TeacherComingSoon title="Earnings" />
+          }
         />
 
       </Route>

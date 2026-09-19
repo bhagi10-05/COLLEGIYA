@@ -12,11 +12,6 @@ import MainLayout from "./layouts/MainLayout";
 import StudentLayout from "./layouts/StudentLayout";
 
 /* =========================
-   TEACHER LAYOUT
-========================= */
-import TeacherLayout from "./layouts/TeacherLayout";
-
-/* =========================
    PUBLIC PAGES
 ========================= */
 import Home from "./pages/Home";
@@ -37,18 +32,16 @@ import StudentProfile from "./student/Profile";
 import StudentCertificate from "./student/Certificate";
 
 /* =========================
-   TEACHER PAGES
+   APP ROUTES
 ========================= */
-import TeacherDashboard from "./teacher/Dashboard";
-import TeacherCourses from "./teacher/Courses";
 
 export default function App() {
   return (
     <Routes>
 
-      {/* ==========================================
+      {/* ==============================================
           PUBLIC COLLEGIYA WEBSITE
-      ========================================== */}
+      ============================================== */}
 
       <Route element={<MainLayout />}>
 
@@ -80,9 +73,9 @@ export default function App() {
       </Route>
 
 
-      {/* ==========================================
+      {/* ==============================================
           STUDENT PORTAL
-      ========================================== */}
+      ============================================== */}
 
       <Route
         path="/student"
@@ -147,36 +140,6 @@ export default function App() {
         <Route
           path="certificates"
           element={<StudentCertificate />}
-        />
-
-      </Route>
-
-
-      {/* ==========================================
-          TEACHER PORTAL
-      ========================================== */}
-
-      <Route
-        path="/teacher"
-        element={<TeacherLayout />}
-      >
-
-        {/* /teacher */}
-        <Route
-          index
-          element={<TeacherDashboard />}
-        />
-
-        {/* /teacher/dashboard */}
-        <Route
-          path="dashboard"
-          element={<TeacherDashboard />}
-        />
-
-        {/* /teacher/courses */}
-        <Route
-          path="courses"
-          element={<TeacherCourses />}
         />
 
       </Route>

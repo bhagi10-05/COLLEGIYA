@@ -55,9 +55,7 @@ function Footer() {
             Student Portal
           </Link>
 
-          <Link to="/teacher/dashboard">
-            Teacher Portal
-          </Link>
+          
 
           <Link to="/college/dashboard">
             College Portal
