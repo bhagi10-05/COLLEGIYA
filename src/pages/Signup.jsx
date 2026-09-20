@@ -136,61 +136,8 @@ export default function Signup() {
 
       <div className="signup-card">
 
-        {/* LEFT PANEL */}
-        <section className="signup-visual">
-
-          <Link to="/" className="signup-logo">
-            <img src="/logo.jpg" alt="COLLEGIYA" />
-          </Link>
-
-          <div className="signup-visual-content">
-
-            <div className="signup-eyebrow">
-              LEARN • GROW • ACHIEVE
-            </div>
-
-            <h1>
-              Your journey
-              <br />
-              <span>starts here.</span>
-            </h1>
-
-            <p>
-              Join COLLEGIYA and build your skills,
-              explore courses and move closer to
-              your goals.
-            </p>
-
-            <div className="signup-highlights">
-
-              <div>
-                <strong>01</strong>
-                <span>Learn at your pace</span>
-              </div>
-
-              <div>
-                <strong>02</strong>
-                <span>Track your progress</span>
-              </div>
-
-              <div>
-                <strong>03</strong>
-                <span>Grow with COLLEGIYA</span>
-              </div>
-
-            </div>
-
-          </div>
-
-          <div className="signup-visual-footer">
-            <span>© {new Date().getFullYear()} COLLEGIYA</span>
-            <span>Education for everyone</span>
-          </div>
-
-        </section>
-
         {/* RIGHT PANEL */}
-        <section className="signup-form-section">
+        <section className="signup-form-section signup-form-full">
 
           <div className="signup-form-header">
 
