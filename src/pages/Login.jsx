@@ -35,6 +35,21 @@ export default function Login() {
       return;
     }
 
+    /*
+      Existing login flow is preserved.
+      A local student session is created only
+      after the existing validation succeeds.
+    */
+
+    const loginToken =
+      `student_${Date.now()}_` +
+      Math.random().toString(36).slice(2);
+
+    localStorage.setItem(
+      "collegiya_student_token",
+      loginToken
+    );
+
     navigate("/student/dashboard");
   };
 
@@ -44,13 +59,21 @@ export default function Login() {
       <div className="login-wrapper">
 
         {/* LEFT BRAND AREA */}
+
         <section className="login-brand-panel">
 
           <div className="login-decoration login-decoration-one" />
+
           <div className="login-decoration login-decoration-two" />
 
-          <Link to="/" className="login-brand-logo">
-            <img src="/logo.jpg" alt="Collegiya" />
+          <Link
+            to="/"
+            className="login-brand-logo"
+          >
+            <img
+              src="/logo.jpg"
+              alt="Collegiya"
+            />
           </Link>
 
           <div className="login-brand-content">
@@ -77,36 +100,57 @@ export default function Login() {
             <div className="login-brand-features">
 
               <div className="login-feature">
+
                 <div className="login-feature-icon">
                   ✓
                 </div>
 
                 <div>
-                  <strong>Structured Courses</strong>
-                  <span>Learn step by step</span>
+                  <strong>
+                    Structured Courses
+                  </strong>
+
+                  <span>
+                    Learn step by step
+                  </span>
                 </div>
+
               </div>
 
               <div className="login-feature">
+
                 <div className="login-feature-icon">
                   ◈
                 </div>
 
                 <div>
-                  <strong>Practice & Quiz</strong>
-                  <span>Improve your knowledge</span>
+                  <strong>
+                    Practice & Quiz
+                  </strong>
+
+                  <span>
+                    Improve your knowledge
+                  </span>
                 </div>
+
               </div>
 
               <div className="login-feature">
+
                 <div className="login-feature-icon">
                   ★
                 </div>
 
                 <div>
-                  <strong>Track Progress</strong>
-                  <span>See how far you have come</span>
+                  <strong>
+                    Track Progress
+                  </strong>
+
+                  <span>
+                    See how far you have come
+                  </span>
                 </div>
+
               </div>
 
             </div>
@@ -122,19 +166,27 @@ export default function Login() {
 
 
         {/* LOGIN AREA */}
+
         <section className="login-form-panel">
 
           <div className="login-form-container">
 
             {/* MOBILE LOGO */}
+
             <div className="login-mobile-logo">
+
               <Link to="/">
-                <img src="/logo.jpg" alt="Collegiya" />
+                <img
+                  src="/logo.jpg"
+                  alt="Collegiya"
+                />
               </Link>
+
             </div>
 
 
             {/* HEADING */}
+
             <div className="login-title">
 
               <span className="login-title-label">
@@ -153,12 +205,14 @@ export default function Login() {
 
 
             {/* FORM */}
+
             <form
               className="login-form"
               onSubmit={submitLogin}
             >
 
               {/* EMAIL */}
+
               <div className="login-group">
 
                 <label htmlFor="login-email">
@@ -178,6 +232,7 @@ export default function Login() {
                       height="14"
                       rx="2"
                     />
+
                     <path d="M3 7l9 6 9-6" />
                   </svg>
 
@@ -197,6 +252,7 @@ export default function Login() {
 
 
               {/* PASSWORD */}
+
               <div className="login-group">
 
                 <div className="login-label-line">
@@ -231,6 +287,7 @@ export default function Login() {
                       height="10"
                       rx="2"
                     />
+
                     <path d="M8 10V7a4 4 0 018 0v3" />
                   </svg>
 
@@ -257,7 +314,9 @@ export default function Login() {
                       )
                     }
                   >
-                    {passwordVisible ? "Hide" : "Show"}
+                    {passwordVisible
+                      ? "Hide"
+                      : "Show"}
                   </button>
 
                 </div>
@@ -266,6 +325,7 @@ export default function Login() {
 
 
               {/* REMEMBER */}
+
               <label className="login-remember">
 
                 <input
@@ -283,11 +343,15 @@ export default function Login() {
 
 
               {/* LOGIN BUTTON */}
+
               <button
                 type="submit"
                 className="login-button"
               >
-                <span>Sign In</span>
+
+                <span>
+                  Sign In
+                </span>
 
                 <svg
                   viewBox="0 0 24 24"
@@ -303,12 +367,14 @@ export default function Login() {
 
 
             {/* DIVIDER */}
+
             <div className="login-divider">
               <span>OR</span>
             </div>
 
 
             {/* GOOGLE */}
+
             <button
               type="button"
               className="login-google"
@@ -329,6 +395,7 @@ export default function Login() {
 
 
             {/* SIGNUP */}
+
             <div className="login-signup">
 
               <span>
@@ -343,6 +410,7 @@ export default function Login() {
 
 
             {/* SECURITY */}
+
             <div className="login-secure">
 
               <svg
@@ -356,6 +424,7 @@ export default function Login() {
                   height="10"
                   rx="2"
                 />
+
                 <path d="M8 10V7a4 4 0 018 0v3" />
               </svg>
 

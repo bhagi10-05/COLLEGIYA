@@ -5,6 +5,8 @@ import MainLayout from "./layouts/MainLayout";
 import StudentLayout from "./layouts/StudentLayout";
 import TeacherLayout from "./layouts/TeacherLayout";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 // =========================
 // PUBLIC
 // =========================
@@ -41,7 +43,6 @@ import TeacherAnnouncements from "./teacher/Announcements";
 import TeacherEarnings from "./teacher/Earnings";
 import TeacherProfile from "./teacher/Profile";
 import TeacherSettings from "./teacher/Settings";
-
 
 export default function App() {
   return (
@@ -82,63 +83,67 @@ export default function App() {
 
 
       {/* =================================
-          STUDENT PORTAL
+          PROTECTED STUDENT PORTAL
       ================================= */}
 
-      <Route
-        path="/student"
-        element={<StudentLayout />}
-      >
+      <Route element={<ProtectedRoute />}>
 
         <Route
-          index
-          element={<StudentDashboard />}
-        />
+          path="/student"
+          element={<StudentLayout />}
+        >
 
-        <Route
-          path="dashboard"
-          element={<StudentDashboard />}
-        />
+          <Route
+            index
+            element={<StudentDashboard />}
+          />
 
-        <Route
-          path="courses"
-          element={<StudentCourses />}
-        />
+          <Route
+            path="dashboard"
+            element={<StudentDashboard />}
+          />
 
-        <Route
-          path="learning"
-          element={<StudentLearning />}
-        />
+          <Route
+            path="courses"
+            element={<StudentCourses />}
+          />
 
-        <Route
-          path="quiz"
-          element={<StudentQuiz />}
-        />
+          <Route
+            path="learning"
+            element={<StudentLearning />}
+          />
 
-        <Route
-          path="notification"
-          element={<StudentNotification />}
-        />
+          <Route
+            path="quiz"
+            element={<StudentQuiz />}
+          />
 
-        <Route
-          path="notifications"
-          element={<StudentNotification />}
-        />
+          <Route
+            path="notification"
+            element={<StudentNotification />}
+          />
 
-        <Route
-          path="profile"
-          element={<StudentProfile />}
-        />
+          <Route
+            path="notifications"
+            element={<StudentNotification />}
+          />
 
-        <Route
-          path="certificate"
-          element={<StudentCertificate />}
-        />
+          <Route
+            path="profile"
+            element={<StudentProfile />}
+          />
 
-        <Route
-          path="certificates"
-          element={<StudentCertificate />}
-        />
+          <Route
+            path="certificate"
+            element={<StudentCertificate />}
+          />
+
+          <Route
+            path="certificates"
+            element={<StudentCertificate />}
+          />
+
+        </Route>
 
       </Route>
 
