@@ -2,11 +2,20 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./signup.css";
 
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000/api";
+
 export default function Signup() {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
+
   const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
+
+  const [loading, setLoading] =
     useState(false);
 
   const [form, setForm] = useState({
@@ -19,32 +28,51 @@ export default function Signup() {
   });
 
   const updateForm = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
 
     setForm((old) => ({
       ...old,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
   };
 
-  const submitSignup = (e) => {
+  const submitSignup = async (e) => {
     e.preventDefault();
 
-    const fullName = form.fullName.trim();
-    const email = form.email.trim().toLowerCase();
+    if (loading) return;
+
+    const fullName =
+      form.fullName.trim();
+
+    const email =
+      form.email.trim().toLowerCase();
 
     if (!fullName) {
-      alert("Please enter your full name.");
+      alert(
+        "Please enter your full name."
+      );
       return;
     }
 
     if (!email) {
-      alert("Please enter your email.");
+      alert(
+        "Please enter your email."
+      );
       return;
     }
 
     if (!form.password) {
-      alert("Please enter your password.");
+      alert(
+        "Please enter your password."
+      );
       return;
     }
 
@@ -77,9 +105,12 @@ export default function Signup() {
     }
 
     if (
-      form.password !== form.confirmPassword
+      form.password !==
+      form.confirmPassword
     ) {
-      alert("Passwords do not match.");
+      alert(
+        "Passwords do not match."
+      );
       return;
     }
 
@@ -90,67 +121,87 @@ export default function Signup() {
       return;
     }
 
-    const existingUser = localStorage.getItem(
-      "collegiya_registered_user"
-    );
-
-    if (existingUser) {
-      try {
-        const user = JSON.parse(existingUser);
-
-        if (
-          user.email &&
-          user.email.toLowerCase() === email
-        ) {
-          alert(
-            "An account with this email already exists. Please login."
-          );
-
-          navigate("/login");
-          return;
-        }
-      } catch (error) {
-        console.error(error);
-      }
+    // Student authentication is currently
+    // connected to the Student backend model.
+    if (form.role !== "Student") {
+      alert(
+        "Currently only Student accounts can be created."
+      );
+      return;
     }
 
-    const newUser = {
-      fullName,
-      email,
-      role: form.role || "Student",
-      password: form.password,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      setLoading(true);
 
-    localStorage.setItem(
-      "collegiya_registered_user",
-      JSON.stringify(newUser)
-    );
+      const response = await fetch(
+        `${API_BASE}/auth/student/signup`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            name: fullName,
+            email,
+            password:
+              form.password,
+          }),
+        }
+      );
 
-    /*
-      Signup does NOT automatically log the user in.
-      The user must login with the registered
-      email and password.
-    */
+      const data =
+        await response.json();
 
-    localStorage.removeItem(
-      "collegiya_student_token"
-    );
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Unable to create account."
+        );
+      }
 
-    localStorage.removeItem(
-      "collegiya_student_user"
-    );
+      // Signup does NOT automatically
+      // log the student in.
+      localStorage.removeItem(
+        "collegiya_student_token"
+      );
 
-    alert(
-      "Account created successfully! Please login to continue."
-    );
+      localStorage.removeItem(
+        "collegiya_student_user"
+      );
 
-    navigate("/login");
+      alert(
+        "Account created successfully! Please login to continue."
+      );
+
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (error) {
+      console.error(
+        "Signup Error:",
+        error
+      );
+
+      if (
+        error instanceof TypeError
+      ) {
+        alert(
+          "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
+        );
+      } else {
+        alert(
+          error.message ||
+            "Signup failed. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="signup-screen">
-
       <div className="signup-wrapper">
 
         {/* BRAND */}
@@ -194,7 +245,6 @@ export default function Signup() {
             <div className="signup-brand-features">
 
               <div className="signup-feature">
-
                 <div className="signup-feature-icon">
                   ✓
                 </div>
@@ -208,7 +258,6 @@ export default function Signup() {
                     Learn at your own pace
                   </span>
                 </div>
-
               </div>
 
               <div className="signup-feature">
@@ -252,12 +301,16 @@ export default function Signup() {
           </div>
 
           <div className="signup-brand-footer">
-            <span>Learn Better.</span>
-            <span>Grow Smarter.</span>
+            <span>
+              Learn Better.
+            </span>
+
+            <span>
+              Grow Smarter.
+            </span>
           </div>
 
         </section>
-
 
         {/* SIGNUP FORM */}
 
@@ -276,7 +329,6 @@ export default function Signup() {
 
             </div>
 
-
             <div className="signup-title">
 
               <span className="signup-title-label">
@@ -292,7 +344,6 @@ export default function Signup() {
               </p>
 
             </div>
-
 
             <form
               className="signup-form"
@@ -315,10 +366,10 @@ export default function Signup() {
                   value={form.fullName}
                   onChange={updateForm}
                   autoComplete="name"
+                  disabled={loading}
                 />
 
               </div>
-
 
               {/* EMAIL */}
 
@@ -336,10 +387,10 @@ export default function Signup() {
                   value={form.email}
                   onChange={updateForm}
                   autoComplete="email"
+                  disabled={loading}
                 />
 
               </div>
-
 
               {/* ROLE */}
 
@@ -354,6 +405,7 @@ export default function Signup() {
                   name="role"
                   value={form.role}
                   onChange={updateForm}
+                  disabled={loading}
                 >
                   <option value="Student">
                     Student
@@ -369,7 +421,6 @@ export default function Signup() {
                 </select>
 
               </div>
-
 
               {/* PASSWORD */}
 
@@ -393,6 +444,7 @@ export default function Signup() {
                     value={form.password}
                     onChange={updateForm}
                     autoComplete="new-password"
+                    disabled={loading}
                   />
 
                   <button
@@ -402,6 +454,7 @@ export default function Signup() {
                         (old) => !old
                       )
                     }
+                    disabled={loading}
                   >
                     {showPassword
                       ? "Hide"
@@ -411,7 +464,6 @@ export default function Signup() {
                 </div>
 
               </div>
-
 
               {/* CONFIRM PASSWORD */}
 
@@ -437,6 +489,7 @@ export default function Signup() {
                     }
                     onChange={updateForm}
                     autoComplete="new-password"
+                    disabled={loading}
                   />
 
                   <button
@@ -446,6 +499,7 @@ export default function Signup() {
                         (old) => !old
                       )
                     }
+                    disabled={loading}
                   >
                     {showConfirmPassword
                       ? "Hide"
@@ -456,7 +510,6 @@ export default function Signup() {
 
               </div>
 
-
               {/* TERMS */}
 
               <label className="signup-terms">
@@ -466,6 +519,7 @@ export default function Signup() {
                   name="terms"
                   checked={form.terms}
                   onChange={updateForm}
+                  disabled={loading}
                 />
 
                 <span>
@@ -474,30 +528,33 @@ export default function Signup() {
 
               </label>
 
-
               {/* CREATE ACCOUNT */}
 
               <button
                 type="submit"
                 className="signup-button"
+                disabled={loading}
               >
 
                 <span>
-                  Create Account
+                  {loading
+                    ? "Creating Account..."
+                    : "Create Account"}
                 </span>
 
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M5 12h14" />
-                  <path d="M13 6l6 6-6 6" />
-                </svg>
+                {!loading && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                )}
 
               </button>
 
             </form>
-
 
             {/* LOGIN */}
 
@@ -512,7 +569,6 @@ export default function Signup() {
               </Link>
 
             </div>
-
 
             <div className="signup-secure">
 
@@ -542,7 +598,6 @@ export default function Signup() {
         </section>
 
       </div>
-
     </main>
   );
 }

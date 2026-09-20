@@ -1,12 +1,24 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import "./login.css";
+
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000/api";
 
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordVisible, setPasswordVisible] =
+    useState(false);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -15,104 +27,145 @@ export default function Login() {
   });
 
   const updateForm = (e) => {
-    const { name, value, type, checked } = e.target;
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
 
     setForm((old) => ({
       ...old,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
     }));
   };
 
-  const submitLogin = (e) => {
+  const submitLogin = async (e) => {
     e.preventDefault();
 
-    const email = form.email.trim().toLowerCase();
-    const password = form.password;
+    if (loading) return;
+
+    const email =
+      form.email.trim().toLowerCase();
+
+    const password =
+      form.password;
 
     if (!email) {
-      alert("Please enter your email.");
+      alert(
+        "Please enter your email."
+      );
       return;
     }
 
     if (!password.trim()) {
-      alert("Please enter your password.");
-      return;
-    }
-
-    /*
-      Check whether the student has created
-      an account through Signup.
-    */
-
-    const registeredUser = localStorage.getItem(
-      "collegiya_registered_user"
-    );
-
-    if (!registeredUser) {
       alert(
-        "Account not found. Please create an account first."
+        "Please enter your password."
       );
-      navigate("/signup");
       return;
     }
-
-    let user;
 
     try {
-      user = JSON.parse(registeredUser);
+      setLoading(true);
+
+      const response = await fetch(
+        `${API_BASE}/auth/student/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        if (
+          response.status === 404 ||
+          response.status === 401
+        ) {
+          alert(
+            data.message ||
+              "Invalid email or password."
+          );
+        } else {
+          alert(
+            data.message ||
+              "Login failed. Please try again."
+          );
+        }
+
+        return;
+      }
+
+      if (
+        !data.token ||
+        !data.student
+      ) {
+        alert(
+          "Login response is invalid. Please try again."
+        );
+        return;
+      }
+
+      // Store real JWT
+      localStorage.setItem(
+        "collegiya_student_token",
+        data.token
+      );
+
+      // Store only safe student information
+      localStorage.setItem(
+        "collegiya_student_user",
+        JSON.stringify({
+          id:
+            data.student.id,
+          fullName:
+            data.student.name,
+          email:
+            data.student.email,
+          role:
+            data.student.role,
+        })
+      );
+
+      const destination =
+        location.state?.from ||
+        "/student/dashboard";
+
+      navigate(destination, {
+        replace: true,
+      });
     } catch (error) {
-      console.error(error);
-
-      localStorage.removeItem(
-        "collegiya_registered_user"
+      console.error(
+        "Login Error:",
+        error
       );
 
-      alert(
-        "Your account data is invalid. Please sign up again."
-      );
-
-      navigate("/signup");
-      return;
+      if (
+        error instanceof TypeError
+      ) {
+        alert(
+          "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
+        );
+      } else {
+        alert(
+          "Login failed. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
-
-    if (
-      !user.email ||
-      !user.password ||
-      user.email.toLowerCase() !== email ||
-      user.password !== password
-    ) {
-      alert(
-        "Invalid email or password. Please check your details."
-      );
-      return;
-    }
-
-    /*
-      Login successful.
-    */
-
-    const loginToken =
-      `student_${Date.now()}_` +
-      Math.random().toString(36).slice(2);
-
-    localStorage.setItem(
-      "collegiya_student_token",
-      loginToken
-    );
-
-    localStorage.setItem(
-      "collegiya_student_user",
-      JSON.stringify({
-        fullName: user.fullName || "",
-        email: user.email || "",
-        role: user.role || "Student",
-      })
-    );
-
-    const destination =
-      location.state?.from || "/student/dashboard";
-
-    navigate(destination, { replace: true });
   };
 
   return (
@@ -220,12 +273,16 @@ export default function Login() {
           </div>
 
           <div className="login-brand-footer">
-            <span>Learn Better.</span>
-            <span>Grow Smarter.</span>
+            <span>
+              Learn Better.
+            </span>
+
+            <span>
+              Grow Smarter.
+            </span>
           </div>
 
         </section>
-
 
         {/* LOGIN AREA */}
 
@@ -259,7 +316,6 @@ export default function Login() {
               </p>
 
             </div>
-
 
             <form
               className="login-form"
@@ -297,12 +353,12 @@ export default function Login() {
                     value={form.email}
                     onChange={updateForm}
                     autoComplete="email"
+                    disabled={loading}
                   />
 
                 </div>
 
               </div>
-
 
               <div className="login-group">
 
@@ -319,6 +375,7 @@ export default function Login() {
                         "Password reset will be connected with backend."
                       )
                     }
+                    disabled={loading}
                   >
                     Forgot password?
                   </button>
@@ -354,6 +411,7 @@ export default function Login() {
                     value={form.password}
                     onChange={updateForm}
                     autoComplete="current-password"
+                    disabled={loading}
                   />
 
                   <button
@@ -364,6 +422,7 @@ export default function Login() {
                         (old) => !old
                       )
                     }
+                    disabled={loading}
                   >
                     {passwordVisible
                       ? "Hide"
@@ -374,7 +433,6 @@ export default function Login() {
 
               </div>
 
-
               <label className="login-remember">
 
                 <input
@@ -382,6 +440,7 @@ export default function Login() {
                   name="remember"
                   checked={form.remember}
                   onChange={updateForm}
+                  disabled={loading}
                 />
 
                 <span>
@@ -390,33 +449,37 @@ export default function Login() {
 
               </label>
 
-
               <button
                 type="submit"
                 className="login-button"
+                disabled={loading}
               >
 
                 <span>
-                  Sign In
+                  {loading
+                    ? "Signing In..."
+                    : "Sign In"}
                 </span>
 
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path d="M5 12h14" />
-                  <path d="M13 6l6 6-6 6" />
-                </svg>
+                {!loading && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                )}
 
               </button>
 
             </form>
 
-
             <div className="login-divider">
-              <span>OR</span>
+              <span>
+                OR
+              </span>
             </div>
-
 
             <button
               type="button"
@@ -426,6 +489,7 @@ export default function Login() {
                   "Google authentication will be connected next."
                 )
               }
+              disabled={loading}
             >
 
               <span className="login-google-icon">
@@ -435,7 +499,6 @@ export default function Login() {
               Continue with Google
 
             </button>
-
 
             <div className="login-signup">
 
@@ -448,7 +511,6 @@ export default function Login() {
               </Link>
 
             </div>
-
 
             <div className="login-secure">
 
