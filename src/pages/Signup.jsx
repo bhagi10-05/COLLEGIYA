@@ -9,10 +9,6 @@ const API_BASE =
 export default function Signup() {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
-
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -22,11 +18,15 @@ export default function Signup() {
     terms: false,
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const updateForm = (e) => {
     const { name, value, type, checked } = e.target;
 
-    setForm((old) => ({
-      ...old,
+    setForm((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
@@ -53,55 +53,43 @@ export default function Signup() {
     }
 
     if (form.password.length < 8) {
-      alert(
-        "Password must be at least 8 characters."
-      );
+      alert("Password must be at least 8 characters.");
       return;
     }
 
     if (!/[A-Z]/.test(form.password)) {
-      alert(
-        "Password must contain at least one uppercase letter."
-      );
+      alert("Password must contain at least one uppercase letter.");
       return;
     }
 
     if (!/[a-z]/.test(form.password)) {
-      alert(
-        "Password must contain at least one lowercase letter."
-      );
+      alert("Password must contain at least one lowercase letter.");
       return;
     }
 
     if (!/[0-9]/.test(form.password)) {
-      alert(
-        "Password must contain at least one number."
-      );
+      alert("Password must contain at least one number.");
       return;
     }
 
-    if (
-      form.password !== form.confirmPassword
-    ) {
+    if (form.password !== form.confirmPassword) {
       alert("Passwords do not match.");
       return;
     }
 
     if (!form.terms) {
-      alert(
-        "Please accept the terms and conditions."
-      );
+      alert("Please accept the terms and conditions.");
       return;
     }
 
     if (form.role !== "Student") {
-      alert(
-        "Currently only Student accounts can be created."
-      );
+      alert("Currently only Student accounts can be created.");
       return;
     }
 
     try {
+      setLoading(true);
+
       const response = await fetch(
         `${API_BASE}/auth/student/signup`,
         {
@@ -120,188 +108,112 @@ export default function Signup() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(
-          data.message ||
-            "Unable to create account."
-        );
+        alert(data.message || "Unable to create account.");
         return;
       }
 
-      /*
-        Signup does NOT automatically log the user in.
-        The user must login with the registered
-        email and password.
-      */
-
-      localStorage.removeItem(
-        "collegiya_student_token"
-      );
-
-      localStorage.removeItem(
-        "collegiya_student_user"
-      );
+      localStorage.removeItem("collegiya_student_token");
+      localStorage.removeItem("collegiya_student_user");
 
       alert(
         "Account created successfully! Please login to continue."
       );
 
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Signup Error:", error);
 
       alert(
         "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="signup-screen">
+    <main className="signup-page">
 
-      <div className="signup-wrapper">
+      <div className="signup-card">
 
-        {/* BRAND */}
+        {/* LEFT PANEL */}
+        <section className="signup-visual">
 
-        <section className="signup-brand-panel">
-
-          <div className="signup-decoration signup-decoration-one" />
-
-          <div className="signup-decoration signup-decoration-two" />
-
-          <Link
-            to="/"
-            className="signup-brand-logo"
-          >
-            <img
-              src="/logo.jpg"
-              alt="Collegiya"
-            />
+          <Link to="/" className="signup-logo">
+            <img src="/logo.jpg" alt="COLLEGIYA" />
           </Link>
 
-          <div className="signup-brand-content">
+          <div className="signup-visual-content">
 
-            <div className="signup-brand-badge">
-              <span />
-              JOIN COLLEGIYA
+            <div className="signup-eyebrow">
+              LEARN • GROW • ACHIEVE
             </div>
 
             <h1>
-              Start.
+              Your journey
               <br />
-              Learn.
-              <br />
-              <strong>Grow.</strong>
+              <span>starts here.</span>
             </h1>
 
             <p>
-              Create your Collegiya account and
-              start your learning journey.
+              Join COLLEGIYA and build your skills,
+              explore courses and move closer to
+              your goals.
             </p>
 
-            <div className="signup-brand-features">
+            <div className="signup-highlights">
 
-              <div className="signup-feature">
-
-                <div className="signup-feature-icon">
-                  ✓
-                </div>
-
-                <div>
-                  <strong>
-                    Structured Learning
-                  </strong>
-
-                  <span>
-                    Learn at your own pace
-                  </span>
-                </div>
-
+              <div>
+                <strong>01</strong>
+                <span>Learn at your pace</span>
               </div>
 
-              <div className="signup-feature">
-
-                <div className="signup-feature-icon">
-                  ◈
-                </div>
-
-                <div>
-                  <strong>
-                    Expert Content
-                  </strong>
-
-                  <span>
-                    Learn from quality resources
-                  </span>
-                </div>
-
+              <div>
+                <strong>02</strong>
+                <span>Track your progress</span>
               </div>
 
-              <div className="signup-feature">
-
-                <div className="signup-feature-icon">
-                  ★
-                </div>
-
-                <div>
-                  <strong>
-                    Track Progress
-                  </strong>
-
-                  <span>
-                    See your learning growth
-                  </span>
-                </div>
-
+              <div>
+                <strong>03</strong>
+                <span>Grow with COLLEGIYA</span>
               </div>
 
             </div>
 
           </div>
 
-          <div className="signup-brand-footer">
-            © {new Date().getFullYear()} COLLEGIYA
+          <div className="signup-visual-footer">
+            <span>© {new Date().getFullYear()} COLLEGIYA</span>
+            <span>Education for everyone</span>
           </div>
 
         </section>
 
-        {/* FORM */}
+        {/* RIGHT PANEL */}
+        <section className="signup-form-section">
 
-        <section className="signup-form-panel">
+          <div className="signup-form-header">
 
-          <div className="signup-mobile-logo">
-            <Link to="/">
-              <img
-                src="/logo.jpg"
-                alt="Collegiya"
-              />
-            </Link>
+            <span className="signup-small-title">
+              CREATE YOUR ACCOUNT
+            </span>
+
+            <h2>Get started</h2>
+
+            <p>
+              Enter your details to create your COLLEGIYA account.
+            </p>
+
           </div>
 
-          <div className="signup-form-container">
+          <form
+            className="signup-form"
+            onSubmit={submitSignup}
+          >
 
-            <div className="signup-title">
+            <div className="signup-row">
 
-              <span>
-                CREATE ACCOUNT
-              </span>
-
-              <h2>
-                Begin your journey.
-              </h2>
-
-              <p>
-                Create your account and unlock
-                the Collegiya learning experience.
-              </p>
-
-            </div>
-
-            <form
-              className="signup-form"
-              onSubmit={submitSignup}
-            >
-
-              <div className="signup-field">
+              <div className="signup-input-group">
 
                 <label htmlFor="fullName">
                   Full Name
@@ -313,13 +225,13 @@ export default function Signup() {
                   type="text"
                   value={form.fullName}
                   onChange={updateForm}
-                  placeholder="Enter your full name"
+                  placeholder="Your full name"
                   autoComplete="name"
                 />
 
               </div>
 
-              <div className="signup-field">
+              <div className="signup-input-group">
 
                 <label htmlFor="email">
                   Email Address
@@ -331,46 +243,102 @@ export default function Signup() {
                   type="email"
                   value={form.email}
                   onChange={updateForm}
-                  placeholder="Enter your email"
+                  placeholder="you@example.com"
                   autoComplete="email"
                 />
 
               </div>
 
-              <div className="signup-field">
+            </div>
 
-                <label htmlFor="role">
-                  I am a
+            <div className="signup-input-group">
+
+              <label>Account Type</label>
+
+              <div className="signup-role-grid">
+
+                <label
+                  className={`signup-role ${
+                    form.role === "Student"
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="Student"
+                    checked={form.role === "Student"}
+                    onChange={updateForm}
+                  />
+                  <span className="signup-role-icon">
+                    🎓
+                  </span>
+                  <span>
+                    <strong>Student</strong>
+                    <small>Learn & grow</small>
+                  </span>
                 </label>
 
-                <select
-                  id="role"
-                  name="role"
-                  value={form.role}
-                  onChange={updateForm}
+                <label
+                  className={`signup-role ${
+                    form.role === "Teacher"
+                      ? "active"
+                      : ""
+                  }`}
                 >
-                  <option value="Student">
-                    Student
-                  </option>
+                  <input
+                    type="radio"
+                    name="role"
+                    value="Teacher"
+                    checked={form.role === "Teacher"}
+                    onChange={updateForm}
+                  />
+                  <span className="signup-role-icon">
+                    👨‍🏫
+                  </span>
+                  <span>
+                    <strong>Teacher</strong>
+                    <small>Teach students</small>
+                  </span>
+                </label>
 
-                  <option value="Teacher">
-                    Teacher
-                  </option>
-
-                  <option value="Creator">
-                    Creator
-                  </option>
-                </select>
+                <label
+                  className={`signup-role ${
+                    form.role === "Creator"
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="Creator"
+                    checked={form.role === "Creator"}
+                    onChange={updateForm}
+                  />
+                  <span className="signup-role-icon">
+                    ✨
+                  </span>
+                  <span>
+                    <strong>Creator</strong>
+                    <small>Create content</small>
+                  </span>
+                </label>
 
               </div>
 
-              <div className="signup-field">
+            </div>
+
+            <div className="signup-row">
+
+              <div className="signup-input-group">
 
                 <label htmlFor="password">
                   Password
                 </label>
 
-                <div className="signup-password-wrap">
+                <div className="signup-password">
 
                   <input
                     id="password"
@@ -382,18 +350,16 @@ export default function Signup() {
                     }
                     value={form.password}
                     onChange={updateForm}
-                    placeholder="Create a strong password"
+                    placeholder="Minimum 8 characters"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
-                    className="signup-password-toggle"
                     onClick={() =>
-                      setShowPassword(
-                        (value) => !value
-                      )
+                      setShowPassword((v) => !v)
                     }
+                    aria-label="Toggle password"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -402,100 +368,87 @@ export default function Signup() {
 
               </div>
 
-              <div className="signup-field">
+              <div className="signup-input-group">
 
                 <label htmlFor="confirmPassword">
                   Confirm Password
                 </label>
 
-                <div className="signup-password-wrap">
+                <div className="signup-password">
 
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={
-                      showConfirmPassword
+                      showConfirm
                         ? "text"
                         : "password"
                     }
-                    value={
-                      form.confirmPassword
-                    }
+                    value={form.confirmPassword}
                     onChange={updateForm}
-                    placeholder="Confirm your password"
+                    placeholder="Re-enter password"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
-                    className="signup-password-toggle"
                     onClick={() =>
-                      setShowConfirmPassword(
-                        (value) => !value
-                      )
+                      setShowConfirm((v) => !v)
                     }
+                    aria-label="Toggle confirm password"
                   >
-                    {showConfirmPassword
-                      ? "Hide"
-                      : "Show"}
+                    {showConfirm ? "Hide" : "Show"}
                   </button>
 
                 </div>
 
               </div>
 
-              <label className="signup-terms">
-
-                <input
-                  name="terms"
-                  type="checkbox"
-                  checked={form.terms}
-                  onChange={updateForm}
-                />
-
-                <span>
-                  I agree to the{" "}
-                  <a
-                    href="#terms"
-                    onClick={(e) =>
-                      e.preventDefault()
-                    }
-                  >
-                    Terms & Conditions
-                  </a>{" "}
-                  and Privacy Policy.
-                </span>
-
-              </label>
-
-              <button
-                type="submit"
-                className="signup-submit"
-              >
-                Create Account
-              </button>
-
-            </form>
-
-            <div className="signup-login">
-
-              Already have an account?{" "}
-
-              <Link to="/login">
-                Login
-              </Link>
-
             </div>
 
-            <div className="signup-secure">
+            <label className="signup-terms">
 
-              <span>🔒</span>
+              <input
+                type="checkbox"
+                name="terms"
+                checked={form.terms}
+                onChange={updateForm}
+              />
 
-              Your information is securely
-              protected.
+              <span>
+                I agree to the{" "}
+                <a
+                  href="#terms"
+                  onClick={(e) => e.preventDefault()}
+                >
+                  Terms & Conditions
+                </a>{" "}
+                and Privacy Policy.
+              </span>
 
-            </div>
+            </label>
 
+            <button
+              type="submit"
+              className="signup-button"
+              disabled={loading}
+            >
+              {loading
+                ? "Creating Account..."
+                : "Create Account"}
+              <span>→</span>
+            </button>
+
+          </form>
+
+          <div className="signup-login-link">
+            Already have an account?
+            <Link to="/login">Login</Link>
+          </div>
+
+          <div className="signup-security">
+            <span>🔒</span>
+            Secure account creation
           </div>
 
         </section>
