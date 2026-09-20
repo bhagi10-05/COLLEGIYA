@@ -1,0 +1,355 @@
+import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import "./students.css";
+
+export default function TeacherStudents() {
+  const [students] = useState([
+    {
+      id: 1,
+      name: "Ramesh Kumar",
+      email: "ramesh@example.com",
+      course: "Full Stack Development",
+      progress: 78,
+      status: "Active",
+      joined: "12 Sep 2026",
+    },
+    {
+      id: 2,
+      name: "Priya Sharma",
+      email: "priya@example.com",
+      course: "Web Development",
+      progress: 64,
+      status: "Active",
+      joined: "10 Sep 2026",
+    },
+    {
+      id: 3,
+      name: "Aman Verma",
+      email: "aman@example.com",
+      course: "JavaScript Masterclass",
+      progress: 91,
+      status: "Active",
+      joined: "06 Sep 2026",
+    },
+  ]);
+
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
+  const stats = useMemo(() => {
+    return {
+      total: students.length,
+      active: students.filter((s) => s.status === "Active").length,
+      completed: students.filter((s) => s.progress >= 90).length,
+      average:
+        students.length === 0
+          ? 0
+          : Math.round(
+              students.reduce((sum, s) => sum + s.progress, 0) /
+                students.length
+            ),
+    };
+  }, [students]);
+
+  const filteredStudents = students.filter((student) => {
+    const text = search.toLowerCase();
+
+    const matchesSearch =
+      student.name.toLowerCase().includes(text) ||
+      student.email.toLowerCase().includes(text) ||
+      student.course.toLowerCase().includes(text);
+
+    const matchesFilter =
+      filter === "All" ||
+      (filter === "Active" && student.status === "Active") ||
+      (filter === "Completed" && student.progress >= 90);
+
+    return matchesSearch && matchesFilter;
+  });
+
+  return (
+    <div className="teacher-students-page">
+
+      <div className="students-header">
+        <div>
+          <span className="students-eyebrow">TEACHER PORTAL</span>
+          <h1>Students</h1>
+          <p>Manage enrolled students and monitor their learning progress.</p>
+        </div>
+
+        <Link to="/teacher/courses" className="students-header-btn">
+          My Courses
+        </Link>
+      </div>
+
+      <div className="students-stats">
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon purple">♙</div>
+          <div>
+            <span>Total Students</span>
+            <strong>{stats.total}</strong>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon green">●</div>
+          <div>
+            <span>Active Students</span>
+            <strong>{stats.active}</strong>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon blue">✓</div>
+          <div>
+            <span>90%+ Progress</span>
+            <strong>{stats.completed}</strong>
+          </div>
+        </div>
+
+        <div className="student-stat-card">
+          <div className="student-stat-icon orange">↗</div>
+          <div>
+            <span>Average Progress</span>
+            <strong>{stats.average}%</strong>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="students-toolbar">
+
+        <div className="students-search">
+          <span>⌕</span>
+          <input
+            type="text"
+            placeholder="Search students, email or course..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="students-filters">
+          {["All", "Active", "Completed"].map((item) => (
+            <button
+              key={item}
+              className={filter === item ? "active" : ""}
+              onClick={() => setFilter(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+      </div>
+
+      <div className="students-card">
+
+        <div className="students-card-top">
+          <div>
+            <h2>Enrolled Students</h2>
+            <p>{filteredStudents.length} students found</p>
+          </div>
+
+          <span className="student-table-label">
+            Student Overview
+          </span>
+        </div>
+
+        {filteredStudents.length === 0 ? (
+          <div className="students-empty">
+            <div>♙</div>
+            <h3>No students found</h3>
+            <p>Try changing your search or filter.</p>
+          </div>
+        ) : (
+          <div className="students-table-wrap">
+
+            <table className="students-table">
+
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Course</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {filteredStudents.map((student) => (
+                  <tr key={student.id}>
+
+                    <td>
+                      <div className="student-profile-cell">
+
+                        <div className="student-avatar">
+                          {student.name.charAt(0)}
+                        </div>
+
+                        <div>
+                          <strong>{student.name}</strong>
+                          <span>{student.email}</span>
+                        </div>
+
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="student-course">
+                        {student.course}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div className="progress-cell">
+
+                        <div className="progress-top">
+                          <span>{student.progress}%</span>
+                        </div>
+
+                        <div className="progress-bar">
+                          <div
+                            style={{
+                              width: `${student.progress}%`,
+                            }}
+                          />
+                        </div>
+
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="student-status">
+                        {student.status}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span className="joined-date">
+                        {student.joined}
+                      </span>
+                    </td>
+
+                    <td>
+                      <button
+                        className="student-view-btn"
+                        onClick={() => setSelectedStudent(student)}
+                      >
+                        View
+                      </button>
+                    </td>
+
+                  </tr>
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+        )}
+
+      </div>
+
+      <div className="students-bottom">
+        <Link to="/teacher/dashboard">
+          ← Back to Dashboard
+        </Link>
+
+        <span>
+          Student management · Frontend mode
+        </span>
+      </div>
+
+      {selectedStudent && (
+        <div
+          className="student-modal-overlay"
+          onClick={() => setSelectedStudent(null)}
+        >
+          <div
+            className="student-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <button
+              className="student-modal-close"
+              onClick={() => setSelectedStudent(null)}
+            >
+              ×
+            </button>
+
+            <div className="student-modal-profile">
+
+              <div className="student-modal-avatar">
+                {selectedStudent.name.charAt(0)}
+              </div>
+
+              <div>
+                <span>STUDENT PROFILE</span>
+                <h2>{selectedStudent.name}</h2>
+                <p>{selectedStudent.email}</p>
+              </div>
+
+            </div>
+
+            <div className="student-details-grid">
+
+              <div>
+                <span>Course</span>
+                <strong>{selectedStudent.course}</strong>
+              </div>
+
+              <div>
+                <span>Status</span>
+                <strong>{selectedStudent.status}</strong>
+              </div>
+
+              <div>
+                <span>Joined</span>
+                <strong>{selectedStudent.joined}</strong>
+              </div>
+
+              <div>
+                <span>Progress</span>
+                <strong>{selectedStudent.progress}%</strong>
+              </div>
+
+            </div>
+
+            <div className="student-modal-progress">
+
+              <div>
+                <span>Course Progress</span>
+                <strong>{selectedStudent.progress}%</strong>
+              </div>
+
+              <div className="progress-bar large">
+                <div
+                  style={{
+                    width: `${selectedStudent.progress}%`,
+                  }}
+                />
+              </div>
+
+            </div>
+
+            <button
+              className="student-modal-action"
+              onClick={() => setSelectedStudent(null)}
+            >
+              Close Profile
+            </button>
+
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}

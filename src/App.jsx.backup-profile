@@ -5,20 +5,14 @@ import MainLayout from "./layouts/MainLayout";
 import StudentLayout from "./layouts/StudentLayout";
 import TeacherLayout from "./layouts/TeacherLayout";
 
-// =========================
-// PUBLIC
-// =========================
-
+// Public Pages
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
 import Learning from "./pages/Learning";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
-// =========================
-// STUDENT
-// =========================
-
+// Student Portal
 import StudentDashboard from "./student/Dashboard";
 import StudentCourses from "./student/Courses";
 import StudentLearning from "./student/Learning";
@@ -27,10 +21,7 @@ import StudentNotification from "./student/Notification";
 import StudentProfile from "./student/Profile";
 import StudentCertificate from "./student/Certificate";
 
-// =========================
-// TEACHER
-// =========================
-
+// Teacher Portal
 import TeacherDashboard from "./teacher/Dashboard";
 import TeacherCourses from "./teacher/Courses";
 import TeacherLectures from "./teacher/Lectures";
@@ -39,24 +30,17 @@ import TeacherQuiz from "./teacher/Quiz";
 import TeacherAssignments from "./teacher/Assignments";
 import TeacherAnnouncements from "./teacher/Announcements";
 import TeacherEarnings from "./teacher/Earnings";
-import TeacherProfile from "./teacher/Profile";
-import TeacherSettings from "./teacher/Settings";
-
 
 export default function App() {
   return (
     <Routes>
 
-      {/* =================================
+      {/* =========================================
           PUBLIC WEBSITE
-      ================================= */}
-
+      ========================================= */}
       <Route element={<MainLayout />}>
 
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/" element={<Home />} />
 
         <Route
           path="/courses"
@@ -81,10 +65,9 @@ export default function App() {
       </Route>
 
 
-      {/* =================================
+      {/* =========================================
           STUDENT PORTAL
-      ================================= */}
-
+      ========================================= */}
       <Route
         path="/student"
         element={<StudentLayout />}
@@ -143,15 +126,15 @@ export default function App() {
       </Route>
 
 
-      {/* =================================
+      {/* =========================================
           TEACHER PORTAL
-      ================================= */}
-
+      ========================================= */}
       <Route
         path="/teacher"
         element={<TeacherLayout />}
       >
 
+        {/* Dashboard */}
         <Route
           index
           element={<TeacherDashboard />}
@@ -162,49 +145,46 @@ export default function App() {
           element={<TeacherDashboard />}
         />
 
+        {/* Courses */}
         <Route
           path="courses"
           element={<TeacherCourses />}
         />
 
+        {/* Lectures */}
         <Route
           path="lectures"
           element={<TeacherLectures />}
         />
 
+        {/* Students */}
         <Route
           path="students"
           element={<TeacherStudents />}
         />
 
+        {/* Quiz & Tests */}
         <Route
           path="quiz"
           element={<TeacherQuiz />}
         />
 
+        {/* Assignments */}
         <Route
           path="assignments"
           element={<TeacherAssignments />}
         />
 
+        {/* Announcements */}
         <Route
           path="announcements"
           element={<TeacherAnnouncements />}
         />
 
+        {/* Earnings */}
         <Route
           path="earnings"
           element={<TeacherEarnings />}
-        />
-
-        <Route
-          path="profile"
-          element={<TeacherProfile />}
-        />
-
-        <Route
-          path="settings"
-          element={<TeacherSettings />}
         />
 
       </Route>

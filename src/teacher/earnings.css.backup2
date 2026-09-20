@@ -1,0 +1,377 @@
+.teacher-earnings-page {
+  min-height: 100%;
+  padding: 28px;
+  background: #f6f8fc;
+  color: #172033;
+}
+
+/* HEADER */
+
+.earnings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.earnings-header-left h1 {
+  margin: 4px 0 8px;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.earnings-header-left p {
+  margin: 0;
+  color: #687386;
+  font-size: 14px;
+}
+
+.earnings-label {
+  display: inline-block;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.earnings-payout-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 20px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+}
+
+.earnings-payout-btn:hover {
+  background: #1d4ed8;
+}
+
+/* STATS */
+
+.earnings-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.earnings-stat-card {
+  background: white;
+  border: 1px solid #e7ebf2;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.earnings-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.earnings-stat-title {
+  color: #697586;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.earnings-stat-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.earnings-stat-value {
+  font-size: 27px;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* TOOLBAR */
+
+.earnings-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+
+.earnings-search {
+  width: 100%;
+  max-width: 420px;
+  height: 46px;
+  border: 1px solid #dfe4ec;
+  border-radius: 12px;
+  background: white;
+  padding: 0 15px;
+  outline: none;
+  font-size: 14px;
+  color: #172033;
+}
+
+.earnings-search:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.earnings-filter {
+  height: 46px;
+  min-width: 140px;
+  border: 1px solid #dfe4ec;
+  border-radius: 12px;
+  background: white;
+  padding: 0 14px;
+  color: #374151;
+  outline: none;
+}
+
+/* TABLE */
+
+.earnings-table-card {
+  background: white;
+  border: 1px solid #e7ebf2;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.04);
+}
+
+.earnings-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.earnings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.earnings-table th {
+  background: #f8fafc;
+  color: #687386;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+  padding: 15px 18px;
+  border-bottom: 1px solid #e8edf3;
+  white-space: nowrap;
+}
+
+.earnings-table td {
+  padding: 17px 18px;
+  border-bottom: 1px solid #edf0f4;
+  font-size: 14px;
+  color: #273142;
+}
+
+.earnings-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.earnings-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.earning-course {
+  font-weight: 700;
+  color: #172033;
+}
+
+.earning-price {
+  font-weight: 800;
+  color: #172033;
+}
+
+.earning-date {
+  color: #7b8494;
+  font-size: 13px;
+}
+
+/* STATUS */
+
+.earning-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.earning-status.paid {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.earning-status.pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+/* EMPTY */
+
+.earnings-empty {
+  text-align: center;
+  padding: 65px 20px;
+}
+
+.earnings-empty-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 25px;
+}
+
+.earnings-empty h3 {
+  margin: 0 0 7px;
+  font-size: 18px;
+}
+
+.earnings-empty p {
+  margin: 0;
+  color: #7b8494;
+  font-size: 14px;
+}
+
+/* MODAL */
+
+.earnings-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.earnings-modal {
+  width: 100%;
+  max-width: 470px;
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+}
+
+.earnings-modal h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.earnings-modal p {
+  margin: 0 0 22px;
+  color: #687386;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.earnings-modal-input {
+  width: 100%;
+  height: 46px;
+  box-sizing: border-box;
+  border: 1px solid #dfe4ec;
+  border-radius: 11px;
+  padding: 0 13px;
+  outline: none;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.earnings-modal-input:focus {
+  border-color: #2563eb;
+}
+
+.earnings-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.earnings-cancel-btn,
+.earnings-confirm-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.earnings-cancel-btn {
+  background: #eef1f5;
+  color: #374151;
+}
+
+.earnings-confirm-btn {
+  background: #2563eb;
+  color: white;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .earnings-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .teacher-earnings-page {
+    padding: 18px;
+  }
+
+  .earnings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .earnings-header-left h1 {
+    font-size: 25px;
+  }
+
+  .earnings-payout-btn {
+    width: 100%;
+  }
+
+  .earnings-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .earnings-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .earnings-search {
+    max-width: none;
+  }
+
+  .earnings-filter {
+    width: 100%;
+  }
+}

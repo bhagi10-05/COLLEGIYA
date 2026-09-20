@@ -1,48 +1,73 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "./dashboard.css";
 
 const courses = [
   {
-    title: "Full Stack Web Development",
-    category: "Development",
+    title: "Web Development",
+    subtitle: "HTML • CSS • JavaScript",
+    icon: "💻",
     progress: 72,
-    lessons: "18 / 25 Lessons",
-    icon: "⌘",
+    lessons: "18 / 25 lessons",
+    action: "Continue Learning",
+    path: "/student/learning",
   },
   {
-    title: "JavaScript Fundamentals",
-    category: "Programming",
-    progress: 58,
-    lessons: "14 / 24 Lessons",
-    icon: "JS",
+    title: "React Development",
+    subtitle: "React • Components • Hooks",
+    icon: "⚛️",
+    progress: 48,
+    lessons: "12 / 25 lessons",
+    action: "Continue Learning",
+    path: "/student/learning",
   },
   {
-    title: "Data Structures & Algorithms",
-    category: "Computer Science",
-    progress: 41,
-    lessons: "10 / 24 Lessons",
-    icon: "DS",
+    title: "Communication Skills",
+    subtitle: "English • Speaking • Writing",
+    icon: "🎤",
+    progress: 35,
+    lessons: "7 / 20 lessons",
+    action: "Continue Learning",
+    path: "/student/learning",
   },
 ];
 
 const activities = [
   {
-    icon: "✓",
-    title: "Quiz completed",
-    text: "JavaScript Basics Quiz",
+    icon: "▶",
+    title: "Completed React Basics",
     time: "Today, 10:30 AM",
   },
   {
-    icon: "▶",
-    title: "Lesson completed",
-    text: "React Components",
-    time: "Yesterday, 7:15 PM",
+    icon: "✓",
+    title: "Quiz submitted successfully",
+    time: "Yesterday, 6:20 PM",
   },
   {
-    icon: "◆",
-    title: "Certificate earned",
-    text: "HTML & CSS Fundamentals",
-    time: "12 Sep 2026",
+    icon: "📚",
+    title: "Started Web Development",
+    time: "Yesterday, 11:15 AM",
+  },
+];
+
+const notifications = [
+  {
+    icon: "📢",
+    title: "New course available",
+    text: "Advanced JavaScript course is now available.",
+    time: "2h ago",
+  },
+  {
+    icon: "📝",
+    title: "Upcoming quiz",
+    text: "React Fundamentals quiz is scheduled soon.",
+    time: "5h ago",
+  },
+  {
+    icon: "🎓",
+    title: "Learning milestone",
+    text: "You are close to completing your weekly goal.",
+    time: "Yesterday",
   },
 ];
 
@@ -50,252 +75,395 @@ function Dashboard() {
   return (
     <div className="student-dashboard">
 
-      {/* HERO */}
-      <section className="student-dashboard-hero">
+      {/* =========================
+          WELCOME HERO
+      ========================== */}
+      <section className="dashboard-hero">
 
         <div className="dashboard-hero-content">
-          <span className="dashboard-eyebrow">
-            STUDENT DASHBOARD
-          </span>
+
+          <div className="dashboard-hero-badge">
+            ✨ STUDENT DASHBOARD
+          </div>
 
           <h1>
-            Welcome back, Student!
+            Welcome back,
+            <span> Student! 👋</span>
           </h1>
 
           <p>
-            Continue your learning journey and keep
-            building your skills.
+            Keep learning, keep growing and take one more step
+            towards your goals today.
           </p>
 
           <div className="dashboard-hero-actions">
-            <a
-              href="/student/learning"
+            <Link
+              to="/student/learning"
               className="dashboard-primary-btn"
             >
               Continue Learning
               <span>→</span>
-            </a>
+            </Link>
 
-            <a
-              href="/student/courses"
+            <Link
+              to="/student/courses"
               className="dashboard-secondary-btn"
             >
               Explore Courses
-            </a>
+            </Link>
           </div>
+
         </div>
 
-        <div className="dashboard-hero-visual">
+        <div className="dashboard-hero-art">
           <div className="hero-orbit orbit-one"></div>
           <div className="hero-orbit orbit-two"></div>
 
-          <div className="hero-learning-card">
-            <span className="hero-card-icon">▶</span>
-
-            <div>
-              <strong>Learning Progress</strong>
-              <small>Keep going!</small>
+          <div className="hero-student-card">
+            <div className="hero-student-icon">
+              🎓
             </div>
 
-            <b>68%</b>
-          </div>
+            <strong>Keep Learning</strong>
 
-          <div className="hero-floating-card hero-card-top">
-            <span>✓</span>
-            <div>
-              <strong>12</strong>
-              <small>Lessons done</small>
-            </div>
-          </div>
-
-          <div className="hero-floating-card hero-card-bottom">
-            <span>◆</span>
-            <div>
-              <strong>4</strong>
-              <small>Certificates</small>
-            </div>
+            <span>
+              Your future starts today
+            </span>
           </div>
         </div>
 
       </section>
 
-      {/* STATISTICS */}
-      <section className="dashboard-stat-grid">
 
-        <div className="dashboard-stat-card">
-          <div className="stat-icon blue">▣</div>
+      {/* =========================
+          STATS
+      ========================== */}
+      <section className="dashboard-stats">
 
-          <div>
+        <div className="dashboard-stat-card stat-blue">
+          <div className="dashboard-stat-icon">
+            📚
+          </div>
+
+          <div className="dashboard-stat-info">
             <span>Enrolled Courses</span>
             <strong>06</strong>
-            <small>2 active this week</small>
+            <small>Active courses</small>
           </div>
         </div>
 
-        <div className="dashboard-stat-card">
-          <div className="stat-icon purple">▶</div>
+        <div className="dashboard-stat-card stat-purple">
+          <div className="dashboard-stat-icon">
+            ⏱️
+          </div>
 
-          <div>
+          <div className="dashboard-stat-info">
             <span>Learning Hours</span>
-            <strong>48.5</strong>
-            <small>+6.2 hrs this month</small>
-          </div>
-        </div>
-
-        <div className="dashboard-stat-card">
-          <div className="stat-icon green">✓</div>
-
-          <div>
-            <span>Completed Lessons</span>
             <strong>42</strong>
-            <small>8 this month</small>
+            <small>This month</small>
           </div>
         </div>
 
-        <div className="dashboard-stat-card">
-          <div className="stat-icon orange">◆</div>
+        <div className="dashboard-stat-card stat-orange">
+          <div className="dashboard-stat-icon">
+            ✓
+          </div>
 
-          <div>
+          <div className="dashboard-stat-info">
+            <span>Tests Completed</span>
+            <strong>18</strong>
+            <small>Total attempts</small>
+          </div>
+        </div>
+
+        <div className="dashboard-stat-card stat-green">
+          <div className="dashboard-stat-icon">
+            🏆
+          </div>
+
+          <div className="dashboard-stat-info">
             <span>Certificates</span>
-            <strong>04</strong>
-            <small>All verified</small>
+            <strong>03</strong>
+            <small>Earned certificates</small>
           </div>
         </div>
 
       </section>
 
-      {/* MAIN GRID */}
+
+      {/* =========================
+          MAIN GRID
+      ========================== */}
       <section className="dashboard-main-grid">
 
-        {/* COURSES */}
-        <div className="dashboard-section-card">
+        {/* LEFT */}
+        <div className="dashboard-main-column">
 
-          <div className="dashboard-section-header">
-            <div>
-              <span className="section-label">
-                YOUR LEARNING
-              </span>
+          {/* CONTINUE LEARNING */}
+          <div className="dashboard-section-card">
 
-              <h2>Continue Learning</h2>
+            <div className="dashboard-section-header">
+              <div>
+                <span className="dashboard-section-label">
+                  MY LEARNING
+                </span>
+
+                <h2>
+                  Continue Learning
+                </h2>
+              </div>
+
+              <Link to="/student/courses">
+                View All →
+              </Link>
             </div>
 
-            <a href="/student/courses">
-              View All →
-            </a>
-          </div>
 
-          <div className="dashboard-course-list">
+            <div className="dashboard-course-list">
 
-            {courses.map((course) => (
-              <div
-                className="dashboard-course"
-                key={course.title}
-              >
+              {courses.map((course) => (
+                <div
+                  className="dashboard-course-card"
+                  key={course.title}
+                >
 
-                <div className="course-icon">
-                  {course.icon}
-                </div>
+                  <div className="dashboard-course-icon">
+                    {course.icon}
+                  </div>
 
-                <div className="course-info">
+                  <div className="dashboard-course-content">
 
-                  <div className="course-title-row">
-                    <div>
-                      <span>{course.category}</span>
-                      <h3>{course.title}</h3>
+                    <div className="dashboard-course-top">
+                      <div>
+                        <h3>{course.title}</h3>
+                        <p>{course.subtitle}</p>
+                      </div>
+
+                      <strong>
+                        {course.progress}%
+                      </strong>
                     </div>
 
-                    <strong>
-                      {course.progress}%
-                    </strong>
-                  </div>
+                    <div className="dashboard-progress">
+                      <span
+                        style={{
+                          width: `${course.progress}%`,
+                        }}
+                      ></span>
+                    </div>
 
-                  <div className="course-progress">
-                    <div
-                      style={{
-                        width: `${course.progress}%`,
-                      }}
-                    ></div>
-                  </div>
+                    <div className="dashboard-course-bottom">
 
-                  <div className="course-bottom-row">
-                    <small>{course.lessons}</small>
+                      <small>
+                        {course.lessons}
+                      </small>
 
-                    <a href="/student/learning">
-                      Continue →
-                    </a>
+                      <Link to={course.path}>
+                        {course.action}
+                        <span>→</span>
+                      </Link>
+
+                    </div>
+
                   </div>
 
                 </div>
+              ))}
 
-              </div>
-            ))}
+            </div>
 
           </div>
+
+
+          {/* RECENT ACTIVITY */}
+          <div className="dashboard-section-card">
+
+            <div className="dashboard-section-header">
+              <div>
+                <span className="dashboard-section-label">
+                  ACTIVITY
+                </span>
+
+                <h2>
+                  Recent Activity
+                </h2>
+              </div>
+
+              <span className="dashboard-live">
+                ● LIVE
+              </span>
+            </div>
+
+            <div className="dashboard-activity-list">
+
+              {activities.map((activity) => (
+                <div
+                  className="dashboard-activity-item"
+                  key={activity.title}
+                >
+
+                  <div className="dashboard-activity-icon">
+                    {activity.icon}
+                  </div>
+
+                  <div>
+                    <strong>
+                      {activity.title}
+                    </strong>
+
+                    <span>
+                      {activity.time}
+                    </span>
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+
+          </div>
+
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="dashboard-right-column">
 
-          {/* WEEKLY GOAL */}
+        {/* RIGHT */}
+        <div className="dashboard-side-column">
+
+          {/* DAILY GOAL */}
           <div className="dashboard-goal-card">
 
-            <div className="goal-header">
+            <div className="dashboard-goal-top">
               <div>
-                <span>WEEKLY GOAL</span>
-                <h3>Learning Target</h3>
+                <span>
+                  TODAY'S GOAL
+                </span>
+
+                <h2>
+                  Keep going!
+                </h2>
               </div>
 
-              <div className="goal-icon">
-                ★
+              <div className="dashboard-goal-emoji">
+                🔥
               </div>
             </div>
 
-            <div className="goal-progress-area">
-
-              <div className="goal-circle">
-                <div>
-                  <strong>72%</strong>
-                  <span>Complete</span>
-                </div>
+            <div className="dashboard-goal-circle">
+              <div className="dashboard-goal-inner">
+                <strong>72%</strong>
+                <span>Complete</span>
               </div>
-
-              <div className="goal-info">
-                <strong>7.2 / 10 hrs</strong>
-                <p>
-                  You're doing great! Keep
-                  learning to reach your goal.
-                </p>
-              </div>
-
             </div>
+
+            <p>
+              You have completed 72% of your daily learning goal.
+            </p>
+
+            <Link
+              to="/student/learning"
+              className="dashboard-goal-btn"
+            >
+              Continue Learning →
+            </Link>
 
           </div>
 
-          {/* QUICK ACTIONS */}
-          <div className="dashboard-quick-card">
 
-            <div className="dashboard-small-heading">
-              <span>QUICK ACTIONS</span>
-              <h3>What do you want to do?</h3>
+          {/* UPCOMING TEST */}
+          <div className="dashboard-test-card">
+
+            <div className="dashboard-test-heading">
+              <div className="dashboard-test-icon">
+                📝
+              </div>
+
+              <div>
+                <span>
+                  UPCOMING TEST
+                </span>
+
+                <h3>
+                  React Fundamentals
+                </h3>
+              </div>
             </div>
 
-            <div className="quick-action-grid">
+            <div className="dashboard-test-details">
 
-              <a href="/student/quiz">
-                <span className="quick-icon blue">
-                  ✓
-                </span>
-                <strong>Take Quiz</strong>
-                <small>Test your skills</small>
-              </a>
+              <div>
+                <span>📅</span>
+                <strong>24 Sept</strong>
+              </div>
 
-              <a href="/student/certificate">
-                <span className="quick-icon purple">
-                  ◆
+              <div>
+                <span>⏱</span>
+                <strong>30 Minutes</strong>
+              </div>
+
+              <div>
+                <span>❓</span>
+                <strong>25 Questions</strong>
+              </div>
+
+            </div>
+
+            <Link
+              to="/student/quiz"
+              className="dashboard-test-btn"
+            >
+              View Test →
+            </Link>
+
+          </div>
+
+
+          {/* NOTIFICATIONS */}
+          <div className="dashboard-section-card dashboard-notification-card">
+
+            <div className="dashboard-section-header">
+              <div>
+                <span className="dashboard-section-label">
+                  UPDATES
                 </span>
-                <strong>Certificates</strong>
-                <small>View achievements</small>
-              </a>
+
+                <h2>
+                  Notifications
+                </h2>
+              </div>
+
+              <Link to="/student/notification">
+                View All
+              </Link>
+            </div>
+
+            <div className="dashboard-notification-list">
+
+              {notifications.map((notification) => (
+                <div
+                  className="dashboard-notification-item"
+                  key={notification.title}
+                >
+
+                  <div className="dashboard-notification-icon">
+                    {notification.icon}
+                  </div>
+
+                  <div className="dashboard-notification-content">
+                    <strong>
+                      {notification.title}
+                    </strong>
+
+                    <p>
+                      {notification.text}
+                    </p>
+
+                    <small>
+                      {notification.time}
+                    </small>
+                  </div>
+
+                </div>
+              ))}
 
             </div>
 
@@ -305,46 +473,37 @@ function Dashboard() {
 
       </section>
 
-      {/* ACTIVITY */}
-      <section className="dashboard-section-card dashboard-activity-card">
 
-        <div className="dashboard-section-header">
-          <div>
-            <span className="section-label">
-              RECENT ACTIVITY
-            </span>
+      {/* =========================
+          MOTIVATION
+      ========================== */}
+      <section className="dashboard-motivation">
 
-            <h2>Your Learning Activity</h2>
-          </div>
-
-          <a href="/student/notification">
-            View All →
-          </a>
+        <div className="dashboard-motivation-icon">
+          🚀
         </div>
 
-        <div className="dashboard-activity-list">
+        <div>
+          <span>
+            YOUR LEARNING JOURNEY
+          </span>
 
-          {activities.map((activity) => (
-            <div
-              className="activity-item"
-              key={`${activity.title}-${activity.time}`}
-            >
+          <h2>
+            Small progress every day creates big results.
+          </h2>
 
-              <div className="activity-icon">
-                {activity.icon}
-              </div>
-
-              <div className="activity-content">
-                <strong>{activity.title}</strong>
-                <span>{activity.text}</span>
-              </div>
-
-              <time>{activity.time}</time>
-
-            </div>
-          ))}
-
+          <p>
+            Stay consistent. Learn something new today and
+            build the future you want.
+          </p>
         </div>
+
+        <Link
+          to="/student/learning"
+          className="dashboard-motivation-btn"
+        >
+          Start Learning →
+        </Link>
 
       </section>
 

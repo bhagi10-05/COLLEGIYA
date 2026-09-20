@@ -1,0 +1,346 @@
+import React, { useState } from "react";
+import "./earnings.css";
+
+const data = [
+  {
+    id: 1,
+    course: "Web Development Complete Course",
+    date: "18 Sep 2026",
+    amount: 2499,
+    status: "Paid",
+  },
+  {
+    id: 2,
+    course: "React JS for Beginners",
+    date: "16 Sep 2026",
+    amount: 1499,
+    status: "Paid",
+  },
+  {
+    id: 3,
+    course: "JavaScript Masterclass",
+    date: "15 Sep 2026",
+    amount: 1999,
+    status: "Pending",
+  },
+  {
+    id: 4,
+    course: "HTML & CSS Basics",
+    date: "12 Sep 2026",
+    amount: 999,
+    status: "Paid",
+  },
+];
+
+function money(value) {
+  return "₹" + value.toLocaleString("en-IN");
+}
+
+export default function Earnings() {
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [payoutOpen, setPayoutOpen] = useState(false);
+
+  const total = data.reduce((sum, item) => sum + item.amount, 0);
+
+  const pending = data
+    .filter((item) => item.status === "Pending")
+    .reduce((sum, item) => sum + item.amount, 0);
+
+  const paid = data
+    .filter((item) => item.status === "Paid")
+    .reduce((sum, item) => sum + item.amount, 0);
+
+  const transactions = data.filter((item) => {
+    const matchesFilter =
+      filter === "All" || item.status === filter;
+
+    const matchesSearch = item.course
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    return matchesFilter && matchesSearch;
+  });
+
+  return (
+    <div className="earnings-page">
+
+      <div className="earnings-header">
+        <div>
+          <div className="earnings-label">TEACHER PORTAL</div>
+          <h1>Earnings</h1>
+          <p>Manage your earnings and payout information.</p>
+        </div>
+
+        <button
+          className="earnings-payout-button"
+          onClick={() => setPayoutOpen(true)}
+        >
+          ₹ Request Payout
+        </button>
+      </div>
+
+      <div className="earnings-stats">
+
+        <div className="earnings-stat purple">
+          <div className="stat-icon">₹</div>
+          <div>
+            <span>Total Earnings</span>
+            <strong>{money(total)}</strong>
+            <small>All time</small>
+          </div>
+        </div>
+
+        <div className="earnings-stat green">
+          <div className="stat-icon">↗</div>
+          <div>
+            <span>This Month</span>
+            <strong>{money(total)}</strong>
+            <small>September 2026</small>
+          </div>
+        </div>
+
+        <div className="earnings-stat orange">
+          <div className="stat-icon">◷</div>
+          <div>
+            <span>Pending</span>
+            <strong>{money(pending)}</strong>
+            <small>Processing</small>
+          </div>
+        </div>
+
+        <div className="earnings-stat blue">
+          <div className="stat-icon">✓</div>
+          <div>
+            <span>Withdrawable</span>
+            <strong>{money(paid)}</strong>
+            <small>Available balance</small>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="earnings-grid">
+
+        <div className="earnings-card">
+
+          <div className="earnings-card-header">
+            <div>
+              <h2>Earnings History</h2>
+              <p>Your recent course transactions.</p>
+            </div>
+          </div>
+
+          <div className="earnings-controls">
+
+            <input
+              type="text"
+              placeholder="Search course..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+
+            <div className="earnings-filter">
+              <button
+                className={filter === "All" ? "active" : ""}
+                onClick={() => setFilter("All")}
+              >
+                All
+              </button>
+
+              <button
+                className={filter === "Paid" ? "active" : ""}
+                onClick={() => setFilter("Paid")}
+              >
+                Paid
+              </button>
+
+              <button
+                className={filter === "Pending" ? "active" : ""}
+                onClick={() => setFilter("Pending")}
+              >
+                Pending
+              </button>
+            </div>
+
+          </div>
+
+          <div className="transactions">
+
+            {transactions.length === 0 ? (
+              <div className="empty-earnings">
+                <div>₹</div>
+                <h3>No transactions found</h3>
+                <p>Try another search or filter.</p>
+              </div>
+            ) : (
+              transactions.map((item) => (
+                <div className="transaction" key={item.id}>
+
+                  <div className="transaction-left">
+                    <div className="transaction-icon">
+                      ₹
+                    </div>
+
+                    <div>
+                      <h3>{item.course}</h3>
+                      <p>Course Sale • {item.date}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <span
+                      className={
+                        item.status === "Paid"
+                          ? "status paid"
+                          : "status pending"
+                      }
+                    >
+                      {item.status}
+                    </span>
+                  </div>
+
+                  <div className="transaction-money">
+                    {money(item.amount)}
+                  </div>
+
+                </div>
+              ))
+            )}
+
+          </div>
+
+        </div>
+
+        <div className="earnings-sidebar">
+
+          <div className="balance-card">
+
+            <span>AVAILABLE BALANCE</span>
+
+            <h2>{money(paid)}</h2>
+
+            <p>
+              Your settled earnings available for payout.
+            </p>
+
+            <button onClick={() => setPayoutOpen(true)}>
+              Request Payout
+            </button>
+
+          </div>
+
+          <div className="course-earnings">
+
+            <h2>Course Earnings</h2>
+
+            <div className="course-item">
+              <div>
+                <span>Web Development</span>
+                <strong>₹2,499</strong>
+              </div>
+              <div className="course-bar">
+                <i style={{ width: "85%" }}></i>
+              </div>
+            </div>
+
+            <div className="course-item">
+              <div>
+                <span>React JS</span>
+                <strong>₹1,499</strong>
+              </div>
+              <div className="course-bar">
+                <i style={{ width: "65%" }}></i>
+              </div>
+            </div>
+
+            <div className="course-item">
+              <div>
+                <span>JavaScript</span>
+                <strong>₹1,999</strong>
+              </div>
+              <div className="course-bar">
+                <i style={{ width: "75%" }}></i>
+              </div>
+            </div>
+
+            <div className="course-item">
+              <div>
+                <span>HTML & CSS</span>
+                <strong>₹999</strong>
+              </div>
+              <div className="course-bar">
+                <i style={{ width: "45%" }}></i>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {payoutOpen && (
+        <div className="payout-overlay">
+
+          <div className="payout-modal">
+
+            <button
+              className="close-payout"
+              onClick={() => setPayoutOpen(false)}
+            >
+              ×
+            </button>
+
+            <div className="payout-icon">₹</div>
+
+            <h2>Request Payout</h2>
+
+            <p>
+              Available balance: <strong>{money(paid)}</strong>
+            </p>
+
+            <label>Amount</label>
+
+            <input
+              type="number"
+              placeholder="Enter amount"
+              max={paid}
+            />
+
+            <label>Payment Method</label>
+
+            <select>
+              <option>Bank Account</option>
+              <option>UPI</option>
+            </select>
+
+            <label>Account / UPI Details</label>
+
+            <input
+              type="text"
+              placeholder="Enter payment details"
+            />
+
+            <button
+              className="submit-payout"
+              onClick={() => {
+                alert("Payout request submitted.");
+                setPayoutOpen(false);
+              }}
+            >
+              Submit Request
+            </button>
+
+            <small>
+              Real payment processing will be connected with the backend later.
+            </small>
+
+          </div>
+
+        </div>
+      )}
+
+    </div>
+  );
+}

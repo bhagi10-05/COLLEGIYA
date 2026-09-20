@@ -1,0 +1,334 @@
+import React, { useMemo, useState } from "react";
+import "./earnings.css";
+
+const initialTransactions = [
+  {
+    id: 1,
+    course: "Web Development Complete Course",
+    type: "Course Sale",
+    amount: 2499,
+    status: "Paid",
+    date: "18 Sep 2026",
+  },
+  {
+    id: 2,
+    course: "React JS for Beginners",
+    type: "Course Sale",
+    amount: 1499,
+    status: "Paid",
+    date: "16 Sep 2026",
+  },
+  {
+    id: 3,
+    course: "JavaScript Masterclass",
+    type: "Course Sale",
+    amount: 1999,
+    status: "Pending",
+    date: "15 Sep 2026",
+  },
+  {
+    id: 4,
+    course: "HTML & CSS Basics",
+    type: "Course Sale",
+    amount: 999,
+    status: "Paid",
+    date: "12 Sep 2026",
+  },
+];
+
+export default function Earnings() {
+  const [transactions, setTransactions] = useState(initialTransactions);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [showPayout, setShowPayout] = useState(false);
+
+  const totalEarnings = transactions.reduce(
+    (sum, item) => sum + item.amount,
+    0
+  );
+
+  const pendingAmount = transactions
+    .filter((item) => item.status === "Pending")
+    .reduce((sum, item) => sum + item.amount, 0);
+
+  const paidAmount = transactions
+    .filter((item) => item.status === "Paid")
+    .reduce((sum, item) => sum + item.amount, 0);
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((item) => {
+      const matchesSearch =
+        item.course.toLowerCase().includes(search.toLowerCase()) ||
+        item.type.toLowerCase().includes(search.toLowerCase());
+
+      const matchesFilter =
+        filter === "All" || item.status === filter;
+
+      return matchesSearch && matchesFilter;
+    });
+  }, [transactions, search, filter]);
+
+  const handlePayout = (e) => {
+    e.preventDefault();
+    alert("Payout request submitted. Backend payment system will be connected later.");
+    setShowPayout(false);
+  };
+
+  const formatMoney = (amount) => {
+    return `₹${amount.toLocaleString("en-IN")}`;
+  };
+
+  return (
+    <div className="teacher-earnings-page">
+      <div className="earnings-header">
+        <div>
+          <span className="earnings-kicker">TEACHER PORTAL</span>
+          <h1>Earnings</h1>
+          <p>
+            Track your course income, pending payments and payouts.
+          </p>
+        </div>
+
+        <button
+          className="payout-btn"
+          onClick={() => setShowPayout(true)}
+        >
+          ₹ Request Payout
+        </button>
+      </div>
+
+      <div className="earnings-stats">
+        <div className="earning-card primary">
+          <div className="earning-icon">₹</div>
+          <div>
+            <span>Total Earnings</span>
+            <strong>{formatMoney(totalEarnings)}</strong>
+            <small>All-time earnings</small>
+          </div>
+        </div>
+
+        <div className="earning-card">
+          <div className="earning-icon green">↗</div>
+          <div>
+            <span>This Month</span>
+            <strong>{formatMoney(totalEarnings)}</strong>
+            <small>September 2026</small>
+          </div>
+        </div>
+
+        <div className="earning-card">
+          <div className="earning-icon orange">◷</div>
+          <div>
+            <span>Pending</span>
+            <strong>{formatMoney(pendingAmount)}</strong>
+            <small>Awaiting settlement</small>
+          </div>
+        </div>
+
+        <div className="earning-card">
+          <div className="earning-icon purple">✓</div>
+          <div>
+            <span>Withdrawable</span>
+            <strong>{formatMoney(paidAmount)}</strong>
+            <small>Available balance</small>
+          </div>
+        </div>
+      </div>
+
+      <div className="earnings-layout">
+        <section className="earnings-main-card">
+          <div className="section-heading">
+            <div>
+              <h2>Earnings History</h2>
+              <p>Recent transactions from your courses.</p>
+            </div>
+          </div>
+
+          <div className="earnings-tools">
+            <div className="earnings-search">
+              <span>⌕</span>
+              <input
+                type="text"
+                placeholder="Search course or transaction..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="earnings-filters">
+              {["All", "Paid", "Pending"].map((item) => (
+                <button
+                  key={item}
+                  className={filter === item ? "active" : ""}
+                  onClick={() => setFilter(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filteredTransactions.length === 0 ? (
+            <div className="earnings-empty">
+              <div>₹</div>
+              <h3>No transactions found</h3>
+              <p>Try changing your search or filter.</p>
+            </div>
+          ) : (
+            <div className="transaction-list">
+              {filteredTransactions.map((item) => (
+                <div className="transaction-row" key={item.id}>
+                  <div className="transaction-course">
+                    <div className="course-money-icon">₹</div>
+
+                    <div>
+                      <h3>{item.course}</h3>
+                      <p>
+                        {item.type} • {item.date}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="transaction-status">
+                    <span className={item.status.toLowerCase()}>
+                      {item.status}
+                    </span>
+                  </div>
+
+                  <div className="transaction-amount">
+                    <strong>{formatMoney(item.amount)}</strong>
+                    <small>Teacher share</small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <aside className="earnings-side">
+          <div className="payout-card">
+            <div className="payout-top">
+              <span>AVAILABLE BALANCE</span>
+              <div>₹</div>
+            </div>
+
+            <h2>{formatMoney(paidAmount)}</h2>
+
+            <p>
+              Amount available for withdrawal after successful
+              settlements.
+            </p>
+
+            <button onClick={() => setShowPayout(true)}>
+              Request Payout
+            </button>
+          </div>
+
+          <div className="earning-info-card">
+            <h3>Course Performance</h3>
+
+            <div className="performance-item">
+              <div>
+                <span>Web Development</span>
+                <strong>₹2,499</strong>
+              </div>
+              <div className="performance-bar">
+                <span style={{ width: "85%" }}></span>
+              </div>
+            </div>
+
+            <div className="performance-item">
+              <div>
+                <span>React JS</span>
+                <strong>₹1,499</strong>
+              </div>
+              <div className="performance-bar">
+                <span style={{ width: "65%" }}></span>
+              </div>
+            </div>
+
+            <div className="performance-item">
+              <div>
+                <span>JavaScript</span>
+                <strong>₹1,999</strong>
+              </div>
+              <div className="performance-bar">
+                <span style={{ width: "75%" }}></span>
+              </div>
+            </div>
+
+            <div className="performance-item">
+              <div>
+                <span>HTML & CSS</span>
+                <strong>₹999</strong>
+              </div>
+              <div className="performance-bar">
+                <span style={{ width: "45%" }}></span>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {showPayout && (
+        <div
+          className="payout-modal-overlay"
+          onClick={() => setShowPayout(false)}
+        >
+          <div
+            className="payout-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="modal-close"
+              onClick={() => setShowPayout(false)}
+            >
+              ×
+            </button>
+
+            <div className="modal-icon">₹</div>
+
+            <h2>Request Payout</h2>
+            <p>
+              Your available balance is{" "}
+              <strong>{formatMoney(paidAmount)}</strong>.
+            </p>
+
+            <form onSubmit={handlePayout}>
+              <label>Payout Amount</label>
+              <input
+                type="number"
+                min="1"
+                max={paidAmount}
+                defaultValue={paidAmount}
+                required
+              />
+
+              <label>Payment Method</label>
+              <select defaultValue="Bank Account">
+                <option>Bank Account</option>
+                <option>UPI</option>
+              </select>
+
+              <label>Account / UPI Details</label>
+              <input
+                type="text"
+                placeholder="Enter payout details"
+                required
+              />
+
+              <button type="submit" className="submit-payout">
+                Submit Payout Request
+              </button>
+            </form>
+
+            <small className="modal-note">
+              Payment gateway and real payout processing will be
+              connected with the backend later.
+            </small>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,22 +1,28 @@
-.teacher-portal {
-  min-height: 100vh;
-  display: flex;
-  background: #f6f8fc;
-  color: #172033;
-  font-family: Inter, Arial, sans-serif;
+* {
+  box-sizing: border-box;
 }
 
+.teacher-portal {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
 .teacher-sidebar {
-  width: 260px;
-  min-width: 260px;
-  height: 100vh;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
-  display: flex;
-  flex-direction: column;
+  bottom: 0;
+  width: 250px;
   background: #ffffff;
   border-right: 1px solid #e8ebf2;
-  z-index: 100;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
 .teacher-brand {
@@ -31,38 +37,40 @@
 .teacher-brand-mark {
   width: 42px;
   height: 42px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  color: #ffffff;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #5b5ff7, #7c3aed);
+  color: white;
   font-size: 21px;
   font-weight: 800;
-  background: linear-gradient(135deg, #6c5ce7, #00b894);
-  box-shadow: 0 7px 18px rgba(108, 92, 231, 0.25);
+  box-shadow: 0 8px 20px rgba(91, 95, 247, 0.22);
 }
 
 .teacher-brand strong {
   display: block;
-  font-size: 17px;
+  font-size: 16px;
   letter-spacing: 0.5px;
 }
 
 .teacher-brand span {
   display: block;
-  margin-top: 2px;
-  color: #8992a5;
+  margin-top: 3px;
   font-size: 11px;
+  color: #8a91a3;
 }
 
 .teacher-nav {
   flex: 1;
-  padding: 22px 13px;
+  padding: 20px 13px;
   overflow-y: auto;
 }
 
 .teacher-nav-title {
-  margin: 0 11px 9px;
-  color: #9ba3b3;
+  padding: 0 12px;
+  margin: 4px 0 10px;
+  color: #9ba2b1;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 1.2px;
@@ -73,161 +81,217 @@
 }
 
 .teacher-nav-link {
-  min-height: 46px;
-  margin-bottom: 4px;
-  padding: 0 12px;
+  height: 46px;
+  padding: 0 13px;
+  margin-bottom: 5px;
   display: flex;
   align-items: center;
-  gap: 13px;
-  border-radius: 11px;
-  color: #687286;
+  gap: 12px;
+  border-radius: 12px;
+  color: #626b7d;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   transition: 0.2s ease;
 }
 
 .teacher-nav-link:hover {
   background: #f4f5ff;
-  color: #5b4ed4;
+  color: #5759e8;
 }
 
 .teacher-nav-link.active {
+  background: linear-gradient(
+    135deg,
+    #5b5ff7,
+    #7048e8
+  );
   color: #ffffff;
-  background: linear-gradient(135deg, #6657df, #7869ec);
-  box-shadow: 0 7px 18px rgba(102, 87, 223, 0.2);
+  box-shadow: 0 8px 18px rgba(91, 95, 247, 0.2);
 }
 
 .teacher-nav-icon {
-  width: 22px;
+  width: 25px;
   text-align: center;
   font-size: 17px;
 }
 
+/* =========================
+   SIDEBAR USER
+========================= */
+
 .teacher-sidebar-user {
-  margin: 14px;
-  padding: 13px;
+  margin: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f6f7fb;
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid #edf0f5;
-  border-radius: 13px;
-  background: #fafbfe;
 }
 
-.teacher-sidebar-user strong,
-.teacher-header-profile strong {
+.teacher-sidebar-user strong {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
 }
 
-.teacher-sidebar-user span,
-.teacher-header-profile span {
+.teacher-sidebar-user span {
   display: block;
-  margin-top: 2px;
-  color: #929bad;
+  margin-top: 3px;
   font-size: 10px;
+  color: #9198a8;
 }
+
+/* =========================
+   AVATAR
+========================= */
 
 .teacher-avatar {
   width: 38px;
   height: 38px;
   flex-shrink: 0;
-  display: grid;
-  place-items: center;
   border-radius: 50%;
-  color: #ffffff;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    #6366f1,
+    #8b5cf6
+  );
+  color: white;
   font-weight: 800;
-  background: linear-gradient(135deg, #ff7675, #fdcb6e);
 }
 
 .teacher-avatar.small {
-  width: 35px;
-  height: 35px;
-  font-size: 13px;
+  width: 36px;
+  height: 36px;
 }
 
+/* =========================
+   MAIN
+========================= */
+
 .teacher-main {
-  min-width: 0;
-  flex: 1;
+  margin-left: 250px;
+  min-height: 100vh;
 }
+
+/* =========================
+   HEADER
+========================= */
 
 .teacher-header {
   height: 82px;
-  padding: 0 30px;
+  padding: 0 28px;
+  background: #ffffff;
+  border-bottom: 1px solid #e9ecf2;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border-bottom: 1px solid #e8ebf2;
+  position: sticky;
+  top: 0;
+  z-index: 900;
 }
 
 .teacher-menu-btn {
   display: none;
   border: 0;
   background: transparent;
-  color: #30394c;
   font-size: 25px;
   cursor: pointer;
 }
 
 .teacher-header-title span {
   display: block;
-  color: #9199a9;
+  color: #9299a9;
   font-size: 11px;
+  margin-bottom: 4px;
 }
 
 .teacher-header-title strong {
   display: block;
-  margin-top: 3px;
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .teacher-header-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 15px;
 }
 
 .teacher-icon-btn {
   width: 38px;
   height: 38px;
-  border: 1px solid #e7eaf1;
-  border-radius: 50%;
-  background: #ffffff;
-  color: #626c7f;
-  font-size: 18px;
+  border: 1px solid #e6e9ef;
+  border-radius: 11px;
+  background: white;
   cursor: pointer;
+  font-size: 17px;
 }
 
 .teacher-header-profile {
   display: flex;
   align-items: center;
   gap: 9px;
+  color: #172033;
   text-decoration: none;
-  color: #20283a;
 }
 
-.teacher-content {
-  padding: 30px;
+.teacher-profile-text strong {
+  display: block;
+  font-size: 12px;
 }
+
+.teacher-profile-text span {
+  display: block;
+  font-size: 10px;
+  color: #9097a7;
+  margin-top: 2px;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.teacher-content {
+  padding: 28px;
+  min-height: calc(100vh - 82px);
+}
+
+/* =========================
+   MOBILE BOTTOM NAV
+========================= */
+
+.teacher-bottom-nav {
+  display: none;
+}
+
+/* =========================
+   OVERLAY
+========================= */
 
 .teacher-overlay {
   display: none;
 }
 
-@media (max-width: 850px) {
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 900px) {
+
   .teacher-sidebar {
-    position: fixed;
-    left: -280px;
-    top: 0;
-    transition: left 0.25s ease;
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.12);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
   }
 
   .teacher-sidebar.open {
-    left: 0;
+    transform: translateX(0);
+  }
+
+  .teacher-main {
+    margin-left: 0;
   }
 
   .teacher-menu-btn {
@@ -238,31 +302,28 @@
     display: block;
     position: fixed;
     inset: 0;
-    background: rgba(20, 25, 40, 0.35);
-    z-index: 90;
-  }
-
-  .teacher-header {
-    padding: 0 18px;
-    gap: 15px;
-  }
-
-  .teacher-header-title {
-    flex: 1;
-  }
-
-  .teacher-header-profile .teacher-profile-text {
-    display: none;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 999;
   }
 
   .teacher-content {
-    padding: 20px 15px;
+    padding: 22px;
   }
 }
 
-@media (max-width: 500px) {
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
   .teacher-header {
-    height: 70px;
+    height: 66px;
+    padding: 0 15px;
+  }
+
+  .teacher-header-title span {
+    display: none;
   }
 
   .teacher-header-title strong {
@@ -276,5 +337,304 @@
   .teacher-icon-btn {
     width: 34px;
     height: 34px;
+  }
+
+  .teacher-profile-text {
+    display: none;
+  }
+
+  .teacher-header-profile .teacher-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .teacher-content {
+    padding: 16px;
+    padding-bottom: 92px;
+    min-height: calc(100vh - 66px);
+  }
+
+  /* BOTTOM HORIZONTAL MENU */
+
+  .teacher-bottom-nav {
+    position: fixed;
+    display: flex;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 72px;
+    padding: 7px 5px 8px;
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid #e6e9ef;
+    box-shadow: 0 -8px 25px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 2000;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .teacher-bottom-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .teacher-bottom-link {
+    min-width: 68px;
+    flex: 0 0 68px;
+    height: 58px;
+    border-radius: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: #858c9c;
+    text-decoration: none;
+    transition: 0.2s ease;
+  }
+
+  .teacher-bottom-icon {
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  .teacher-bottom-label {
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .teacher-bottom-link.active {
+    color: #5b5ff7;
+    background: #f0f1ff;
+  }
+
+  .teacher-bottom-link.active .teacher-bottom-icon {
+    transform: translateY(-1px);
+  }
+}
+
+/* =========================
+   SMALL PHONES
+========================= */
+
+@media (max-width: 380px) {
+
+  .teacher-bottom-link {
+    min-width: 62px;
+    flex-basis: 62px;
+  }
+
+  .teacher-bottom-label {
+    font-size: 8px;
+  }
+
+  .teacher-bottom-icon {
+    font-size: 17px;
+  }
+
+}
+
+/* =========================
+   PROFILE + SETTINGS MENU
+========================= */
+
+.teacher-account-menu {
+  position: relative;
+}
+
+.teacher-header-profile {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 3px;
+}
+
+.teacher-account-arrow {
+  margin-left: 2px;
+  font-size: 12px;
+  color: #8d94a5;
+}
+
+.teacher-account-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 175px;
+  padding: 7px;
+  background: #ffffff;
+  border: 1px solid #e7eaf0;
+  border-radius: 13px;
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.14);
+  z-index: 3000;
+}
+
+.teacher-account-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 11px;
+  border-radius: 9px;
+  color: #4f586a;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.teacher-account-dropdown a:hover {
+  background: #f3f4ff;
+  color: #5b5ff7;
+}
+
+.teacher-account-dropdown a span {
+  width: 20px;
+  text-align: center;
+  font-size: 15px;
+}
+
+@media (max-width: 650px) {
+  .teacher-account-arrow {
+    display: none;
+  }
+
+  .teacher-account-dropdown {
+    right: -5px;
+    top: calc(100% + 8px);
+  }
+}
+
+/* =================================
+   FIT MOBILE BOTTOM MENU
+================================= */
+
+@media (max-width: 650px) {
+
+  .teacher-bottom-nav {
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 100%;
+    height: 68px;
+
+    padding: 5px 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.97);
+
+    border-top: 1px solid #e6e9ef;
+
+    box-shadow:
+      0 -6px 22px rgba(15, 23, 42, 0.08);
+
+    z-index: 2000;
+
+    box-sizing: border-box;
+  }
+
+  .teacher-bottom-link {
+    min-width: 0;
+    width: 20%;
+    flex: 1 1 20%;
+
+    height: 56px;
+
+    padding: 4px 2px;
+
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    border-radius: 11px;
+
+    color: #858c9c;
+
+    text-decoration: none;
+
+    overflow: hidden;
+
+    transition: 0.2s ease;
+  }
+
+  .teacher-bottom-icon {
+    width: 100%;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .teacher-bottom-label {
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 9px;
+    line-height: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .teacher-bottom-link.active {
+    color: #5b5ff7;
+    background: #f0f1ff;
+  }
+
+  .teacher-bottom-link.active
+  .teacher-bottom-icon {
+    transform: translateY(-1px);
+  }
+
+  /* Content should not hide behind bottom menu */
+  .teacher-content {
+    padding-bottom: 84px;
+  }
+}
+
+/* VERY SMALL PHONES */
+
+@media (max-width: 360px) {
+
+  .teacher-bottom-nav {
+    height: 64px;
+    padding: 4px 2px;
+  }
+
+  .teacher-bottom-link {
+    height: 54px;
+    border-radius: 9px;
+  }
+
+  .teacher-bottom-icon {
+    font-size: 17px;
+  }
+
+  .teacher-bottom-label {
+    font-size: 8px;
+  }
+
+  .teacher-content {
+    padding-bottom: 80px;
   }
 }

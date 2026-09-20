@@ -1,285 +1,382 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import "./learning.css";
 
-const lessons = [
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const DEFAULT_VIDEO =
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+
+const fallbackLessons = [
   {
-    id: 1,
+    id: "1",
     title: "Introduction to Web Development",
+    chapter: "Chapter 01",
     duration: "08:42",
+    type: "Video",
+    completed: true,
+    video: DEFAULT_VIDEO,
+    notesUrl: "",
+    resourceUrl: "",
     description:
-      "Web development kya hai, frontend aur backend kya hota hai aur website kaise kaam karti hai.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "blue",
+      "Introduction to modern web development and the technologies used to build websites.",
   },
   {
-    id: 2,
-    title: "HTML Complete Basics",
-    duration: "12:20",
+    id: "2",
+    title: "HTML Fundamentals",
+    chapter: "Chapter 02",
+    duration: "12:18",
+    type: "Video",
+    completed: true,
+    video: DEFAULT_VIDEO,
+    notesUrl: "",
+    resourceUrl: "",
     description:
-      "HTML structure, headings, paragraphs, links, images aur important HTML elements.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "purple",
+      "Learn the basic structure of HTML documents and important HTML elements.",
   },
   {
-    id: 3,
-    title: "CSS From Zero",
-    duration: "15:40",
+    id: "3",
+    title: "CSS Fundamentals",
+    chapter: "Chapter 03",
+    duration: "15:26",
+    type: "Video",
+    completed: false,
+    video: DEFAULT_VIDEO,
+    notesUrl: "",
+    resourceUrl: "",
     description:
-      "CSS selectors, colors, fonts, spacing, borders, layouts aur responsive design.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "cyan",
-  },
-  {
-    id: 4,
-    title: "JavaScript Fundamentals",
-    duration: "18:15",
-    description:
-      "Variables, functions, conditions, loops, events aur JavaScript fundamentals.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "orange",
-  },
-  {
-    id: 5,
-    title: "React Introduction",
-    duration: "20:30",
-    description:
-      "React components, JSX, props, state aur modern frontend development.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "pink",
-  },
-  {
-    id: 6,
-    title: "Build Your First Project",
-    duration: "24:10",
-    description:
-      "HTML, CSS, JavaScript aur React ko use karke practical project banana.",
-    video: "https://www.w3schools.com/html/mov_bbb.mp4",
-    color: "green",
+      "Learn how CSS is used to design and style modern web pages.",
   },
 ];
 
-function Learning() {
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return "00:00";
+
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(
+    2,
+    "0"
+  )}`;
+}
+
+function getYouTubeEmbedUrl(url) {
+  if (!url) return "";
+
+  try {
+    const parsed = new URL(url);
+
+    if (
+      parsed.hostname.includes("youtube.com") ||
+      parsed.hostname.includes("youtu.be")
+    ) {
+      if (parsed.pathname === "/watch") {
+        const videoId = parsed.searchParams.get("v");
+
+        if (videoId) {
+          return `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+
+      if (parsed.hostname.includes("youtu.be")) {
+        const videoId = parsed.pathname.replace("/", "").split("/")[0];
+
+        if (videoId) {
+          return `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+
+      if (parsed.pathname.startsWith("/embed/")) {
+        return url;
+      }
+
+      if (parsed.pathname.startsWith("/shorts/")) {
+        const videoId = parsed.pathname.split("/")[2];
+
+        if (videoId) {
+          return `https://www.youtube.com/embed/${videoId}`;
+        }
+      }
+    }
+  } catch (error) {
+    return "";
+  }
+
+  return "";
+}
+
+export default function Learning() {
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get("course");
+
   const videoRef = useRef(null);
   const playerRef = useRef(null);
-  const controlsTimer = useRef(null);
 
-  const [currentLesson, setCurrentLesson] = useState(lessons[0]);
+  const [course, setCourse] = useState(null);
+  const [lessons, setLessons] = useState([]);
+  const [currentLesson, setCurrentLesson] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [buffered, setBuffered] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [muted, setMuted] = useState(false);
-  const [speed, setSpeed] = useState(1);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [controlsVisible, setControlsVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [descriptionOpen, setDescriptionOpen] = useState(false);
 
-  const [completed, setCompleted] = useState(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("collegiya_learning_completed") || "[]"
-      );
-    } catch {
-      return [];
-    }
-  });
+  const [completedLessons, setCompletedLessons] = useState([]);
 
-  const currentIndex =
-    lessons.findIndex((item) => item.id === currentLesson.id) + 1;
+  useEffect(() => {
+    let cancelled = false;
 
-  const progress =
+    const loadCourse = async () => {
+      setIsLoading(true);
+      setError("");
+
+      try {
+        if (!courseId) {
+          if (!cancelled) {
+            setCourse({
+              title: "Web Development",
+              description:
+                "Master modern web development through structured, practical video lessons.",
+              instructor: "COLLEGIYA Faculty",
+            });
+
+            setLessons(fallbackLessons);
+            setCurrentLesson(fallbackLessons[0].id);
+
+            setCompletedLessons(
+              fallbackLessons
+                .filter((lesson) => lesson.completed)
+                .map((lesson) => lesson.id)
+            );
+          }
+
+          return;
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/courses/${courseId}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.message || "Course could not be loaded."
+          );
+        }
+
+        const apiCourse = data.course;
+
+        const apiLessons = Array.isArray(apiCourse.lessons)
+          ? apiCourse.lessons
+              .filter((lesson) => lesson.published === true)
+              .map((lesson, index) => ({
+                id: lesson._id || `lesson-${index + 1}`,
+                title:
+                  lesson.title || `Lesson ${index + 1}`,
+                chapter:
+                  lesson.chapter ||
+                  `Chapter ${String(index + 1).padStart(2, "0")}`,
+                duration: lesson.duration || "00:00",
+                type: lesson.type || "Video",
+                completed: false,
+                video: lesson.videoUrl || "",
+                notesUrl: lesson.notesUrl || "",
+                resourceUrl: lesson.resourceUrl || "",
+                description: lesson.description || "",
+                order: Number(lesson.order) || index + 1,
+              }))
+              .sort((a, b) => a.order - b.order)
+          : [];
+
+        if (!cancelled) {
+          setCourse(apiCourse);
+          setLessons(apiLessons);
+
+          if (apiLessons.length > 0) {
+            setCurrentLesson(apiLessons[0].id);
+          } else {
+            setCurrentLesson(null);
+          }
+
+          setCompletedLessons([]);
+        }
+      } catch (err) {
+        console.error("Learning course error:", err);
+
+        if (!cancelled) {
+          setError(
+            err.message ||
+              "Unable to load course. Please try again."
+          );
+
+          setCourse(null);
+          setLessons([]);
+          setCurrentLesson(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadCourse();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [courseId]);
+
+  const lesson = lessons.find(
+    (item) => String(item.id) === String(currentLesson)
+  );
+
+  const completedCount = completedLessons.length;
+
+  const courseProgress =
     lessons.length > 0
-      ? Math.round((completed.length / lessons.length) * 100)
+      ? Math.round((completedCount / lessons.length) * 100)
       : 0;
 
-  useEffect(() => {
-    localStorage.setItem(
-      "collegiya_learning_completed",
-      JSON.stringify(completed)
-    );
-  }, [completed]);
+  const currentIndex = lesson
+    ? lessons.findIndex(
+        (item) =>
+          String(item.id) === String(currentLesson)
+      )
+    : -1;
+
+  const instructor =
+    course?.instructor || "COLLEGIYA Faculty";
+
+  const courseTitle =
+    course?.title || "Web Development";
+
+  const lessonDescription =
+    lesson?.description ||
+    "In this lesson, you will learn the core concepts required to build modern websites. Follow the lesson carefully and practice each concept on your own device.";
+
+  const youtubeEmbed =
+    lesson?.type === "Video"
+      ? getYouTubeEmbedUrl(lesson?.video)
+      : "";
+
+  const hasDirectVideo =
+    lesson?.type === "Video" &&
+    lesson?.video &&
+    !youtubeEmbed;
 
   useEffect(() => {
-    const handleFullscreen = () => {
-      setIsFullscreen(Boolean(document.fullscreenElement));
-    };
+    setCurrentTime(0);
+    setDuration(0);
+    setIsPlaying(false);
 
-    document.addEventListener("fullscreenchange", handleFullscreen);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreen);
-    };
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (controlsTimer.current) {
-        clearTimeout(controlsTimer.current);
-      }
-    };
-  }, []);
-
-  const showControls = () => {
-    setControlsVisible(true);
-
-    if (controlsTimer.current) {
-      clearTimeout(controlsTimer.current);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.load();
     }
+  }, [currentLesson]);
 
-    controlsTimer.current = setTimeout(() => {
-      if (videoRef.current && !videoRef.current.paused) {
-        setControlsVisible(false);
-      }
-    }, 3000);
-  };
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        Boolean(document.fullscreenElement)
+      );
+    };
 
-  const playPause = async () => {
-    const video = videoRef.current;
+    document.addEventListener(
+      "fullscreenchange",
+      handleFullscreenChange
+    );
 
-    if (!video) return;
+    return () => {
+      document.removeEventListener(
+        "fullscreenchange",
+        handleFullscreenChange
+      );
+    };
+  }, []);
 
-    if (video.paused) {
+  const togglePlay = async () => {
+    if (!videoRef.current || !lesson) return;
+
+    if (videoRef.current.paused) {
       try {
-        await video.play();
+        await videoRef.current.play();
+        setIsPlaying(true);
       } catch (error) {
-        console.log(error);
+        console.log("Video play blocked:", error);
       }
     } else {
-      video.pause();
+      videoRef.current.pause();
+      setIsPlaying(false);
     }
-
-    showControls();
   };
 
-  const seek = (seconds) => {
-    const video = videoRef.current;
+  const handleLoadedMetadata = () => {
+    if (!videoRef.current) return;
 
-    if (!video) return;
-
-    video.currentTime = Math.max(
-      0,
-      Math.min(video.currentTime + seconds, video.duration || 0)
-    );
-
-    showControls();
+    setDuration(videoRef.current.duration || 0);
   };
 
-  const changeProgress = (event) => {
-    const video = videoRef.current;
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
 
-    if (!video) return;
+    setCurrentTime(videoRef.current.currentTime);
+  };
 
+  const handleSeek = (event) => {
     const value = Number(event.target.value);
 
-    video.currentTime = value;
-    setCurrentTime(value);
-    showControls();
+    if (videoRef.current) {
+      videoRef.current.currentTime = value;
+      setCurrentTime(value);
+    }
   };
 
-  const changeVolume = (event) => {
+  const handleVolume = (event) => {
     const value = Number(event.target.value);
-    const video = videoRef.current;
-
-    if (!video) return;
-
-    video.volume = value;
-    video.muted = value === 0;
 
     setVolume(value);
-    setMuted(value === 0);
+
+    if (videoRef.current) {
+      videoRef.current.volume = value;
+    }
   };
 
-  const toggleMute = () => {
-    const video = videoRef.current;
-
-    if (!video) return;
-
-    video.muted = !video.muted;
-    setMuted(video.muted);
-  };
-
-  const changeSpeed = (value) => {
-    const video = videoRef.current;
-
-    if (!video) return;
-
-    video.playbackRate = value;
-    setSpeed(value);
-    setSettingsOpen(false);
-    showControls();
-  };
-
-  const fullscreen = async () => {
-    const player = playerRef.current;
-
-    if (!player) return;
+  const toggleFullscreen = async () => {
+    if (!playerRef.current) return;
 
     try {
       if (!document.fullscreenElement) {
-        await player.requestFullscreen();
+        await playerRef.current.requestFullscreen();
       } else {
         await document.exitFullscreen();
       }
     } catch (error) {
-      console.log(error);
+      console.log("Fullscreen error:", error);
     }
   };
 
-  const formatTime = (value) => {
-    if (!Number.isFinite(value)) return "00:00";
+  const markComplete = () => {
+    if (!lesson) return;
 
-    const hours = Math.floor(value / 3600);
-    const minutes = Math.floor((value % 3600) / 60);
-    const seconds = Math.floor(value % 60);
-
-    if (hours > 0) {
-      return (
-        String(hours).padStart(2, "0") +
-        ":" +
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(seconds).padStart(2, "0")
-      );
+    if (!completedLessons.includes(lesson.id)) {
+      setCompletedLessons((previous) => [
+        ...previous,
+        lesson.id,
+      ]);
     }
-
-    return (
-      String(minutes).padStart(2, "0") +
-      ":" +
-      String(seconds).padStart(2, "0")
-    );
   };
 
-  const completeLesson = (id) => {
-    setCompleted((old) => {
-      if (old.includes(id)) return old;
-      return [...old, id];
-    });
-  };
-
-  const selectLesson = (lesson) => {
-    const index = lessons.findIndex(
-      (item) => item.id === lesson.id
-    );
-
-    if (index > 0) {
-      const previousLesson = lessons[index - 1];
-
-      if (!completed.includes(previousLesson.id)) {
-        return;
-      }
-    }
-
-    setCurrentLesson(lesson);
-    setCurrentTime(0);
-    setDuration(0);
-    setBuffered(0);
-    setIsPlaying(false);
-    setSettingsOpen(false);
-    setDescriptionOpen(false);
+  const selectLesson = (id) => {
+    setCurrentLesson(id);
 
     window.scrollTo({
       top: 0,
@@ -287,515 +384,698 @@ function Learning() {
     });
   };
 
-  const previousLesson = () => {
-    if (currentIndex <= 1) return;
-
-    selectLesson(lessons[currentIndex - 2]);
-  };
-
   const nextLesson = () => {
-    completeLesson(currentLesson.id);
+    if (!lesson) return;
 
-    if (currentIndex < lessons.length) {
-      selectLesson(lessons[currentIndex]);
+    if (currentIndex < lessons.length - 1) {
+      markComplete();
+
+      setCurrentLesson(
+        lessons[currentIndex + 1].id
+      );
     }
   };
 
-  const handleEnded = () => {
-    setIsPlaying(false);
-    setControlsVisible(true);
-    completeLesson(currentLesson.id);
+  const previousLesson = () => {
+    if (!lesson) return;
+
+    if (currentIndex > 0) {
+      setCurrentLesson(
+        lessons[currentIndex - 1].id
+      );
+    }
   };
 
-  useEffect(() => {
-    const handleKeyboard = (event) => {
-      const tag = event.target?.tagName?.toLowerCase();
+  const handleVideoEnded = () => {
+    markComplete();
+    setIsPlaying(false);
+  };
 
-      if (
-        tag === "input" ||
-        tag === "button" ||
-        tag === "textarea"
-      ) {
-        return;
-      }
+  if (isLoading) {
+    return (
+      <div className="premium-learning">
+        <section className="learning-top">
+          <div className="learning-breadcrumb">
+            <Link to="/student/dashboard">
+              Dashboard
+            </Link>
 
-      if (event.code === "Space" || event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        playPause();
-      }
+            <span>/</span>
 
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        seek(-10);
-      }
+            <span>My Learning</span>
+          </div>
 
-      if (event.key === "ArrowRight") {
-        event.preventDefault();
-        seek(10);
-      }
+          <div className="learning-heading-row">
+            <div>
+              <span className="learning-eyebrow">
+                <span className="eyebrow-dot"></span>
+                LOADING COURSE
+              </span>
 
-      if (event.key.toLowerCase() === "m") {
-        event.preventDefault();
-        toggleMute();
-      }
+              <h1>Loading...</h1>
 
-      if (event.key.toLowerCase() === "f") {
-        event.preventDefault();
-        fullscreen();
-      }
-    };
+              <p>
+                Please wait while your course is loading.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
-    window.addEventListener("keydown", handleKeyboard);
+  if (error) {
+    return (
+      <div className="premium-learning">
+        <section className="learning-top">
+          <div className="learning-breadcrumb">
+            <Link to="/student/dashboard">
+              Dashboard
+            </Link>
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyboard);
-    };
-  });
+            <span>/</span>
+
+            <span>My Learning</span>
+          </div>
+
+          <div className="learning-heading-row">
+            <div>
+              <span className="learning-eyebrow">
+                <span className="eyebrow-dot"></span>
+                COURSE ERROR
+              </span>
+
+              <h1>Unable to Load Course</h1>
+
+              <p>{error}</p>
+
+              <Link
+                to="/student/courses"
+                style={{
+                  display: "inline-block",
+                  marginTop: "20px",
+                }}
+              >
+                ← Back to Courses
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (!lesson) {
+    return (
+      <div className="premium-learning">
+        <section className="learning-top">
+          <div className="learning-breadcrumb">
+            <Link to="/student/dashboard">
+              Dashboard
+            </Link>
+
+            <span>/</span>
+
+            <span>My Learning</span>
+          </div>
+
+          <div className="learning-heading-row">
+            <div>
+              <span className="learning-eyebrow">
+                <span className="eyebrow-dot"></span>
+                COURSE CONTENT
+              </span>
+
+              <h1>
+                {course?.title || "Course"}
+              </h1>
+
+              <p>
+                No published lessons are available in this
+                course yet.
+              </p>
+
+              <Link
+                to="/student/courses"
+                style={{
+                  display: "inline-block",
+                  marginTop: "20px",
+                }}
+              >
+                ← Back to Courses
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
-    <main className="color-learning-page">
-      <div className="learning-wrapper">
+    <div className="premium-learning">
+      {/* PAGE HEADER */}
+      <section className="learning-top">
+        <div className="learning-breadcrumb">
+          <Link to="/student/dashboard">
+            Dashboard
+          </Link>
 
-        {/* TOP COURSE HEADER */}
+          <span>/</span>
 
-        <div className="course-top-card">
-          <div className="course-top-left">
-            <div className="course-icon">
-              🎓
-            </div>
+          <span>My Learning</span>
 
-            <div>
-              <span>COLLEGIYA COURSE</span>
-              <h2>Full Stack Web Development</h2>
-            </div>
+          <span>/</span>
+
+          <strong>{courseTitle}</strong>
+        </div>
+
+        <div className="learning-heading-row">
+          <div>
+            <span className="learning-eyebrow">
+              <span className="eyebrow-dot"></span>
+              STUDENT LEARNING
+            </span>
+
+            <h1>{lesson.title}</h1>
+
+            <p>
+              {courseTitle} • {instructor}
+            </p>
           </div>
 
           <div className="course-progress-box">
-            <strong>{progress}%</strong>
+            <div>
+              <span>COURSE PROGRESS</span>
+              <strong>{courseProgress}%</strong>
+            </div>
 
-            <div className="course-progress-track">
+            <div className="playlist-progress-track">
               <div
+                className="playlist-progress"
                 style={{
-                  width: `${progress}%`,
+                  width: `${courseProgress}%`,
                 }}
-              />
+              ></div>
             </div>
 
             <small>
-              {completed.length}/{lessons.length} completed
+              {completedCount} of {lessons.length} lessons
+              completed
             </small>
           </div>
         </div>
+      </section>
 
-        {/* VIDEO */}
-
-        <section
-          ref={playerRef}
-          className={
-            isFullscreen
-              ? "color-player fullscreen-player"
-              : "color-player"
-          }
-          onMouseMove={showControls}
-          onTouchStart={showControls}
-        >
-          <video
-            ref={videoRef}
-            key={currentLesson.id}
-            className="color-video"
-            src={currentLesson.video}
-            playsInline
-            preload="metadata"
-            onClick={playPause}
-            onPlay={() => {
-              setIsPlaying(true);
-              showControls();
-            }}
-            onPause={() => {
-              setIsPlaying(false);
-              setControlsVisible(true);
-            }}
-            onLoadedMetadata={(event) => {
-              setDuration(event.target.duration || 0);
-            }}
-            onTimeUpdate={(event) => {
-              const video = event.target;
-
-              setCurrentTime(video.currentTime);
-
-              if (
-                video.buffered.length > 0 &&
-                video.duration
-              ) {
-                const end = video.buffered.end(
-                  video.buffered.length - 1
-                );
-
-                setBuffered(
-                  Math.min(
-                    100,
-                    (end / video.duration) * 100
-                  )
-                );
-              }
-            }}
-            onEnded={handleEnded}
-          />
-
-          {!isPlaying && (
-            <button
-              className="big-play-button"
-              onClick={playPause}
-              aria-label="Play video"
-            >
-              ▶
-            </button>
-          )}
-
-          <button
-            className="skip-button skip-left"
-            onDoubleClick={() => seek(-10)}
-          >
-            <span>↶</span>
-            <small>10</small>
-          </button>
-
-          <button
-            className="skip-button skip-right"
-            onDoubleClick={() => seek(10)}
-          >
-            <span>↷</span>
-            <small>10</small>
-          </button>
-
+      {/* CLASSROOM */}
+      <section className="learning-classroom">
+        <div className="video-section">
           <div
-            className={
-              controlsVisible
-                ? "color-controls controls-show"
-                : "color-controls"
-            }
+            className="video-card"
+            ref={playerRef}
           >
-            <div className="color-progress">
-              <div
-                className="color-buffer"
-                style={{
-                  width: `${buffered}%`,
-                }}
-              />
+            <div className="video-top-overlay">
+              <span className="video-course-badge">
+                {lesson.type}
+              </span>
 
-              <div
-                className="color-played"
-                style={{
-                  width:
-                    duration > 0
-                      ? `${(currentTime / duration) * 100}%`
-                      : "0%",
-                }}
-              />
-
-              <input
-                type="range"
-                min="0"
-                max={duration || 0}
-                step="0.1"
-                value={currentTime}
-                onChange={changeProgress}
-              />
+              <span>
+                {lesson.chapter}
+              </span>
             </div>
 
-            <div className="control-row">
-              <div className="control-left">
-                <button onClick={playPause}>
-                  {isPlaying ? "❚❚" : "▶"}
-                </button>
+            {lesson.type === "Video" &&
+              youtubeEmbed && (
+                <div className="main-video youtube-video-wrapper">
+                  <iframe
+                    src={youtubeEmbed}
+                    title={lesson.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              )}
 
-                <button
-                  className="ten-sec"
-                  onClick={() => seek(-10)}
-                >
-                  ↶
-                  <small>10</small>
-                </button>
-
-                <button
-                  className="ten-sec"
-                  onClick={() => seek(10)}
-                >
-                  ↷
-                  <small>10</small>
-                </button>
-
-                <button onClick={toggleMute}>
-                  {muted || volume === 0 ? "🔇" : "🔊"}
-                </button>
-
-                <input
-                  className="volume-control"
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={muted ? 0 : volume}
-                  onChange={changeVolume}
-                />
-
-                <span className="time-text">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
-              </div>
-
-              <div className="control-right">
-                <div className="settings-area">
-                  <button
-                    onClick={() =>
-                      setSettingsOpen(!settingsOpen)
+            {lesson.type === "Video" &&
+              hasDirectVideo && (
+                <>
+                  <video
+                    ref={videoRef}
+                    className="main-video"
+                    preload="metadata"
+                    onLoadedMetadata={
+                      handleLoadedMetadata
                     }
+                    onTimeUpdate={
+                      handleTimeUpdate
+                    }
+                    onPlay={() =>
+                      setIsPlaying(true)
+                    }
+                    onPause={() =>
+                      setIsPlaying(false)
+                    }
+                    onEnded={
+                      handleVideoEnded
+                    }
+                    playsInline
                   >
-                    ⚙
+                    <source
+                      src={lesson.video}
+                    />
+                    Your browser does not support
+                    HTML video.
+                  </video>
+
+                  <button
+                    className="big-play"
+                    onClick={togglePlay}
+                    aria-label="Play video"
+                  >
+                    {isPlaying ? "Ⅱ" : "▶"}
                   </button>
 
-                  {settingsOpen && (
-                    <div className="speed-menu">
-                      <strong>Playback speed</strong>
-
-                      {[0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(
-                        (item) => (
-                          <button
-                            key={item}
-                            className={
-                              speed === item
-                                ? "speed-active"
-                                : ""
-                            }
-                            onClick={() =>
-                              changeSpeed(item)
-                            }
-                          >
-                            {item === 1 ? "Normal" : `${item}x`}
-
-                            {speed === item && " ✓"}
-                          </button>
-                        )
-                      )}
+                  <div className="custom-controls">
+                    <div className="video-progress">
+                      <input
+                        type="range"
+                        min="0"
+                        max={duration || 0}
+                        step="0.1"
+                        value={Math.min(
+                          currentTime,
+                          duration || 0
+                        )}
+                        onChange={handleSeek}
+                      />
                     </div>
-                  )}
+
+                    <div className="controls-row">
+                      <div className="controls-left">
+                        <button
+                          className="control-button"
+                          onClick={togglePlay}
+                        >
+                          {isPlaying ? "Ⅱ" : "▶"}
+                        </button>
+
+                        <span className="time-display">
+                          {formatTime(currentTime)} /{" "}
+                          {formatTime(duration)}
+                        </span>
+                      </div>
+
+                      <div className="controls-right">
+                        <div className="volume-control">
+                          <span>
+                            {volume === 0
+                              ? "🔇"
+                              : "🔊"}
+                          </span>
+
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.05"
+                            value={volume}
+                            onChange={
+                              handleVolume
+                            }
+                          />
+                        </div>
+
+                        <button
+                          className="control-button"
+                          onClick={
+                            toggleFullscreen
+                          }
+                        >
+                          {isFullscreen
+                            ? "⤢"
+                            : "⛶"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+            {lesson.type === "Video" &&
+              !lesson.video && (
+                <div className="video-center-control">
+                  <div className="empty-video-icon">
+                    ▶
+                  </div>
+
+                  <h3>
+                    Video not available
+                  </h3>
+
+                  <p>
+                    Teacher has not added a video URL
+                    for this lesson yet.
+                  </p>
+                </div>
+              )}
+
+            {lesson.type !== "Video" && (
+              <div className="video-center-control">
+                <div className="empty-video-icon">
+                  {lesson.type === "PDF"
+                    ? "📄"
+                    : lesson.type === "Article"
+                    ? "📖"
+                    : "🎓"}
                 </div>
 
-                <button onClick={fullscreen}>⛶</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* VIDEO INFORMATION */}
-
-        <section className="video-info-card">
-          <div className="lesson-badge">
-            LESSON {currentIndex}
-          </div>
-
-          <h1>{currentLesson.title}</h1>
-
-          <div className="lesson-meta">
-            <span>🎓 COLLEGIYA Learning</span>
-            <span>•</span>
-            <span>{currentLesson.duration}</span>
-
-            {completed.includes(currentLesson.id) && (
-              <>
-                <span>•</span>
-                <span className="completed-text">
-                  ✓ Completed
+                <span className="video-course-badge">
+                  {lesson.type}
                 </span>
-              </>
+
+                <h3>{lesson.title}</h3>
+
+                <p>
+                  This lesson is available as{" "}
+                  {lesson.type.toLowerCase()} content.
+                </p>
+
+                {lesson.notesUrl && (
+                  <a
+                    href={lesson.notesUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="next-lesson-button"
+                  >
+                    Open Notes / PDF →
+                  </a>
+                )}
+              </div>
             )}
           </div>
 
-          <div className="action-buttons">
-            <button
-              className={liked ? "active-action" : ""}
-              onClick={() => setLiked(!liked)}
-            >
-              {liked ? "♥" : "♡"} Like
-            </button>
+          {/* LESSON INFORMATION */}
+          <div className="lesson-information">
+            <div className="lesson-title-area">
+              <span className="lesson-chapter">
+                {lesson.chapter}
+              </span>
 
-            <button>
-              ↗ Share
-            </button>
+              <h2>{lesson.title}</h2>
 
-            <button
-              className={saved ? "active-action" : ""}
-              onClick={() => setSaved(!saved)}
-            >
-              {saved ? "✓ Saved" : "＋ Save"}
-            </button>
-          </div>
-        </section>
+              <div className="lesson-meta">
+                <span>
+                  ⏱ {lesson.duration}
+                </span>
 
-        {/* DESCRIPTION */}
+                <span>
+                  •
+                </span>
 
-        <section className="description-card">
-          <div className="description-heading">
-            <div>
-              <span>ABOUT THIS LESSON</span>
-              <h3>What you will learn</h3>
+                <span>
+                  {lesson.type}
+                </span>
+
+                <span>
+                  •
+                </span>
+
+                <span>
+                  Lesson {currentIndex + 1} of{" "}
+                  {lessons.length}
+                </span>
+              </div>
             </div>
 
             <button
-              onClick={() =>
-                setDescriptionOpen(!descriptionOpen)
+              className="complete-button"
+              onClick={markComplete}
+            >
+              {completedLessons.includes(
+                lesson.id
+              )
+                ? "✓ Completed"
+                : "Mark Complete"}
+            </button>
+          </div>
+
+          {/* RESOURCES */}
+          {(lesson.notesUrl ||
+            lesson.resourceUrl) && (
+            <div
+              className="lesson-highlights"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "12px",
+                marginTop: "18px",
+              }}
+            >
+              {lesson.notesUrl && (
+                <a
+                  href={lesson.notesUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="next-lesson-button"
+                >
+                  📄 Open Notes / PDF
+                </a>
+              )}
+
+              {lesson.resourceUrl && (
+                <a
+                  href={lesson.resourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="next-lesson-button"
+                >
+                  🔗 Open Resource
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* NAVIGATION */}
+          <div className="lesson-navigation">
+            <button
+              className="next-lesson-button"
+              onClick={previousLesson}
+              disabled={currentIndex <= 0}
+            >
+              ← Previous Lesson
+            </button>
+
+            <button
+              className="next-lesson-button"
+              onClick={nextLesson}
+              disabled={
+                currentIndex >=
+                lessons.length - 1
               }
             >
-              {descriptionOpen ? "Less" : "More"}
+              Next Lesson →
             </button>
           </div>
 
-          <p
-            className={
-              descriptionOpen
-                ? "description-full"
-                : ""
-            }
-          >
-            {currentLesson.description}
-            <br />
-            <br />
-            Lesson complete karne ke baad next lesson unlock
-            hoga. Concepts ko sirf dekhna nahi, practice bhi
-            karna hai.
-          </p>
-        </section>
+          {/* DETAILS */}
+          <div className="learning-details">
+            <div className="details-tabs">
+              <button className="active">
+                Overview
+              </button>
 
-        {/* PLAYLIST */}
-
-        <section className="playlist-card">
-          <div className="playlist-header">
-            <div>
-              <span>YOUR LEARNING JOURNEY</span>
-              <h2>Course Playlist</h2>
-              <p>
-                Complete lessons step-by-step
-              </p>
+              <button>
+                Resources
+              </button>
             </div>
 
-            <div className="playlist-progress">
-              <strong>{progress}%</strong>
+            <div className="overview-content">
+              <h3>
+                About this lesson
+              </h3>
 
-              <div>
-                <i
-                  style={{
-                    width: `${progress}%`,
-                  }}
-                />
+              <p>
+                {lessonDescription}
+              </p>
+
+              <div className="lesson-highlights">
+                <div>
+                  <strong>
+                    Chapter
+                  </strong>
+
+                  <span>
+                    {lesson.chapter}
+                  </span>
+                </div>
+
+                <div>
+                  <strong>
+                    Type
+                  </strong>
+
+                  <span>
+                    {lesson.type}
+                  </span>
+                </div>
+
+                <div>
+                  <strong>
+                    Duration
+                  </strong>
+
+                  <span>
+                    {lesson.duration}
+                  </span>
+                </div>
+
+                <div>
+                  <strong>
+                    Instructor
+                  </strong>
+
+                  <span>
+                    {instructor}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-
-          <div className="lesson-list">
-            {lessons.map((lesson, index) => {
-              const isCurrent =
-                lesson.id === currentLesson.id;
-
-              const isCompleted =
-                completed.includes(lesson.id);
-
-              const isLocked =
-                index > 0 &&
-                !completed.includes(
-                  lessons[index - 1].id
-                );
-
-              return (
-                <button
-                  key={lesson.id}
-                  disabled={isLocked}
-                  onClick={() => selectLesson(lesson)}
-                  className={[
-                    "lesson-item",
-                    `lesson-${lesson.color}`,
-                    isCurrent ? "lesson-current" : "",
-                    isCompleted ? "lesson-done" : "",
-                    isLocked ? "lesson-locked" : "",
-                  ].join(" ")}
-                >
-                  <div className="lesson-number">
-                    {isCompleted ? "✓" : index + 1}
-                  </div>
-
-                  <div className="lesson-thumbnail">
-                    <div className="thumbnail-shape">
-                      <span>▶</span>
-                    </div>
-
-                    <small>{lesson.duration}</small>
-                  </div>
-
-                  <div className="lesson-content">
-                    <h3>{lesson.title}</h3>
-
-                    <p>{lesson.description}</p>
-
-                    <span>
-                      {isCompleted
-                        ? "✓ Completed"
-                        : isCurrent
-                        ? "● Now Playing"
-                        : isLocked
-                        ? "🔒 Complete previous lesson"
-                        : "▶ Start lesson"}
-                    </span>
-                  </div>
-
-                  <div className="lesson-right">
-                    {isCompleted && (
-                      <b>✓</b>
-                    )}
-
-                    {isLocked && (
-                      <b>🔒</b>
-                    )}
-
-                    {isCurrent && !isCompleted && (
-                      <i />
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* PREVIOUS NEXT */}
-
-        <div className="lesson-navigation">
-          <button
-            disabled={currentIndex === 1}
-            onClick={previousLesson}
-          >
-            <span>←</span>
-
-            <div>
-              <small>PREVIOUS</small>
-              <strong>Lesson</strong>
-            </div>
-          </button>
-
-          <button
-            disabled={currentIndex === lessons.length}
-            onClick={nextLesson}
-          >
-            <div>
-              <small>NEXT</small>
-              <strong>Lesson</strong>
-            </div>
-
-            <span>→</span>
-          </button>
         </div>
 
-      </div>
-    </main>
+        {/* PLAYLIST */}
+        <aside className="playlist-card">
+          <div className="playlist-header">
+            <div>
+              <span>
+                COURSE PLAYLIST
+              </span>
+
+              <h2>
+                {courseTitle}
+              </h2>
+            </div>
+
+            <div className="progress-ring-mini">
+              {courseProgress}%
+            </div>
+          </div>
+
+          <div className="playlist-progress-top">
+            <div>
+              <span>
+                Your progress
+              </span>
+
+              <strong>
+                {completedCount}/{lessons.length}
+              </strong>
+            </div>
+
+            <div className="playlist-progress-track">
+              <div
+                className="playlist-progress"
+                style={{
+                  width: `${courseProgress}%`,
+                }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="playlist-menu">
+            {lessons.map(
+              (item, index) => {
+                const active =
+                  String(item.id) ===
+                  String(currentLesson);
+
+                const completed =
+                  completedLessons.includes(
+                    item.id
+                  );
+
+                return (
+                  <button
+                    key={item.id}
+                    className={`playlist-item ${
+                      active ? "active" : ""
+                    }`}
+                    onClick={() =>
+                      selectLesson(item.id)
+                    }
+                  >
+                    <div className="playlist-item-top">
+                      <div className="lesson-number">
+                        {String(
+                          index + 1
+                        ).padStart(2, "0")}
+                      </div>
+
+                      <div className="playlist-item-info">
+                        <span>
+                          {item.chapter}
+                        </span>
+
+                        <strong>
+                          {item.title}
+                        </strong>
+
+                        <div className="playlist-item-meta">
+                          <span>
+                            {item.type}
+                          </span>
+
+                          <span>
+                            {item.duration}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="playlist-arrow">
+                        {completed
+                          ? "✓"
+                          : active
+                          ? "▶"
+                          : "›"}
+                      </div>
+                    </div>
+                  </button>
+                );
+              }
+            )}
+          </div>
+
+          <div className="playlist-footer">
+            <span>
+              {lessons.length} lessons
+            </span>
+
+            <span>
+              {courseProgress}% completed
+            </span>
+          </div>
+        </aside>
+      </section>
+
+      {/* MOBILE NEXT */}
+      {currentIndex <
+        lessons.length - 1 && (
+        <div className="mobile-next-card">
+          <span>
+            NEXT LESSON
+          </span>
+
+          <strong>
+            {lessons[currentIndex + 1].title}
+          </strong>
+
+          <button
+            className="next-lesson-button"
+            onClick={nextLesson}
+          >
+            Continue →
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
-
-export default Learning;

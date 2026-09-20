@@ -1,300 +1,680 @@
-import React, { useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import "./courses.css";
 
-const courses = [
-  {
-    id: 1,
-    icon: "💻",
-    category: "Development",
-    title: "Web Development",
-    description: "Learn HTML, CSS, JavaScript and build modern websites.",
-    lessons: 25,
-    completed: 18,
-    progress: 72,
-    level: "Beginner",
-    duration: "8 Weeks",
-  },
-  {
-    id: 2,
-    icon: "⚡",
-    category: "Programming",
-    title: "JavaScript Basics",
-    description: "Build a strong foundation in modern JavaScript programming.",
-    lessons: 24,
-    completed: 14,
-    progress: 58,
-    level: "Beginner",
-    duration: "6 Weeks",
-  },
-  {
-    id: 3,
-    icon: "⚛",
-    category: "Development",
-    title: "React Fundamentals",
-    description: "Create interactive and scalable interfaces with React.",
-    lessons: 22,
-    completed: 8,
-    progress: 35,
-    level: "Intermediate",
-    duration: "7 Weeks",
-  },
-  {
-    id: 4,
-    icon: "🟢",
-    category: "Backend",
-    title: "Node.js & Express",
-    description: "Learn backend development and create powerful APIs.",
-    lessons: 28,
-    completed: 0,
-    progress: 0,
-    level: "Intermediate",
-    duration: "8 Weeks",
-  },
-  {
-    id: 5,
-    icon: "🍃",
-    category: "Database",
-    title: "MongoDB Essentials",
-    description: "Understand NoSQL databases and work with MongoDB.",
-    lessons: 20,
-    completed: 0,
-    progress: 0,
-    level: "Beginner",
-    duration: "5 Weeks",
-  },
-  {
-    id: 6,
-    icon: "🤖",
-    category: "Technology",
-    title: "AI & Machine Learning",
-    description: "Explore AI concepts and start building intelligent systems.",
-    lessons: 30,
-    completed: 0,
-    progress: 0,
-    level: "Intermediate",
-    duration: "10 Weeks",
-  },
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+const DEFAULT_THUMBNAIL = "/logo.jpg";
+
+const filters = [
+  "All Courses",
+  "In Progress",
+  "Completed",
+  "Not Started",
 ];
 
-const categories = [
-  "All",
-  "Development",
-  "Programming",
-  "Backend",
-  "Database",
-  "Technology",
+const colors = [
+  "blue",
+  "purple",
+  "orange",
+  "green",
+  "pink",
+  "cyan",
 ];
+
+const icons = [
+  "💻",
+  "⚛️",
+  "🎤",
+  "🖥️",
+  "🧩",
+  "🚀",
+];
+
+function formatDuration(duration) {
+  if (!duration) return "Not added";
+  return duration;
+}
+
+function getCourseStatus(course) {
+  const progress = Number(course.progress) || 0;
+
+  if (progress >= 100) {
+    return "Completed";
+  }
+
+  if (progress > 0) {
+    return "In Progress";
+  }
+
+  return "Not Started";
+}
+
+function normalizeCourse(course, index) {
+  const lessons = Array.isArray(course.lessons)
+    ? course.lessons.length
+    : Number(course.plannedLectures) || 0;
+
+  const progress = Number(course.progress) || 0;
+
+  return {
+    id: course._id,
+    title: course.title || "Untitled Course",
+    category: course.category || "General",
+    level: course.level || "Beginner",
+    icon: icons[index % icons.length],
+    description:
+      course.description ||
+      "Start learning this course with COLLEGIYA.",
+    instructor:
+      course.instructor || "COLLEGIYA Faculty",
+    lessons,
+    hours: formatDuration(course.duration),
+    progress,
+    color: colors[index % colors.length],
+    status: getCourseStatus(course),
+    thumbnail:
+      course.thumbnail || DEFAULT_THUMBNAIL,
+  };
+}
 
 function Courses() {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [courses, setCourses] = useState([]);
+  const [activeFilter, setActiveFilter] =
+    useState("All Courses");
   const [search, setSearch] = useState("");
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // =================================
+  // LOAD PUBLISHED COURSES
+  // =================================
+
+  const loadCourses = useCallback(async () => {
+    try {
+      setError("");
+
+      const response = await fetch(
+        `${API_BASE_URL}/courses?_=${Date.now()}`,
+        {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Failed to load courses."
+        );
+      }
+
+      const normalizedCourses = (
+        Array.isArray(data.courses)
+          ? data.courses
+          : []
+      ).map(normalizeCourse);
+
+      setCourses(normalizedCourses);
+    } catch (err) {
+      console.error(
+        "Student courses loading error:",
+        err
+      );
+
+      setError(
+        err.message ||
+          "Unable to connect with COLLEGIYA backend."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // =================================
+  // FIRST LOAD
+  // =================================
+
+  useEffect(() => {
+    loadCourses();
+  }, [loadCourses]);
+
+  // =================================
+  // AUTO REFRESH
+  // =================================
+
+  useEffect(() => {
+    const handleFocus = () => {
+      loadCourses();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadCourses();
+      }
+    };
+
+    window.addEventListener(
+      "focus",
+      handleFocus
+    );
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+
+    return () => {
+      window.removeEventListener(
+        "focus",
+        handleFocus
+      );
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
+  }, [loadCourses]);
+
+  // =================================
+  // FILTER + SEARCH
+  // =================================
+
   const filteredCourses = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
     return courses.filter((course) => {
-      const matchesCategory =
-        activeCategory === "All" ||
-        course.category === activeCategory;
+      const matchesFilter =
+        activeFilter === "All Courses" ||
+        course.status === activeFilter;
 
-      const text =
-        `${course.title} ${course.category} ${course.description}`.toLowerCase();
+      const matchesSearch =
+        !query ||
+        `${course.title} ${course.category} ${course.level} ${course.description} ${course.instructor}`
+          .toLowerCase()
+          .includes(query);
 
-      const matchesSearch = text.includes(search.toLowerCase().trim());
-
-      return matchesCategory && matchesSearch;
+      return matchesFilter && matchesSearch;
     });
-  }, [activeCategory, search]);
+  }, [
+    courses,
+    activeFilter,
+    search,
+  ]);
+
+  // =================================
+  // COURSE STATS
+  // =================================
+
+  const totalCourses = courses.length;
+
+  const inProgressCourses =
+    courses.filter(
+      (course) =>
+        course.status === "In Progress"
+    ).length;
+
+  const completedCourses =
+    courses.filter(
+      (course) =>
+        course.status === "Completed"
+    ).length;
 
   return (
-    <div className="sc-page">
-      <section className="sc-header">
-        <div className="sc-header-content">
-          <span className="sc-eyebrow">STUDENT LEARNING</span>
+    <div className="student-courses">
+
+      {/* =================================
+          PAGE HERO
+      ================================= */}
+
+      <section className="courses-hero">
+
+        <div className="courses-hero-content">
+
+          <div className="courses-hero-badge">
+            📚 MY LEARNING
+          </div>
 
           <h1>
-            My <strong>Courses</strong>
+            My Courses
           </h1>
 
           <p>
-            Continue your learning journey and build skills that move
-            you forward.
+            अपने enrolled courses को manage करें और अपनी
+            learning journey को आगे बढ़ाएं।
           </p>
-        </div>
 
-        <div className="sc-header-art">
-          <div className="sc-art-circle sc-art-circle-one"></div>
-          <div className="sc-art-circle sc-art-circle-two"></div>
+          <div className="courses-hero-stats">
 
-          <div className="sc-art-card">
-            <span>ACTIVE COURSES</span>
-            <strong>06</strong>
-            <small>Keep learning</small>
+            <div>
+              <strong>
+                {String(totalCourses).padStart(
+                  2,
+                  "0"
+                )}
+              </strong>
+
+              <span>
+                Total Courses
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                {String(
+                  inProgressCourses
+                ).padStart(2, "0")}
+              </strong>
+
+              <span>
+                In Progress
+              </span>
+            </div>
+
+            <div>
+              <strong>
+                {String(
+                  completedCourses
+                ).padStart(2, "0")}
+              </strong>
+
+              <span>
+                Completed
+              </span>
+            </div>
+
           </div>
+
         </div>
+
+        <div className="courses-hero-visual">
+
+          <div className="courses-floating-card card-one">
+            📖
+          </div>
+
+          <div className="courses-floating-card card-two">
+            🎯
+          </div>
+
+          <div className="courses-hero-book">
+            <span>📚</span>
+            <strong>LEARN</strong>
+            <small>EVERY DAY</small>
+          </div>
+
+        </div>
+
       </section>
 
-      <section className="sc-toolbar">
-        <div className="sc-search">
-          <span>⌕</span>
+      {/* =================================
+          ERROR
+      ================================= */}
+
+      {error && (
+        <div
+          style={{
+            margin: "20px 0",
+            padding: "14px 18px",
+            borderRadius: "14px",
+            background: "#fff1f2",
+            color: "#be123c",
+            border: "1px solid #fecdd3",
+            fontWeight: 600,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {/* =================================
+          TOOLBAR
+      ================================= */}
+
+      <section className="courses-toolbar">
+
+        <div className="courses-filter-list">
+
+          {filters.map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              className={
+                activeFilter === filter
+                  ? "course-filter active"
+                  : "course-filter"
+              }
+              onClick={() =>
+                setActiveFilter(filter)
+              }
+            >
+              {filter}
+            </button>
+          ))}
+
+        </div>
+
+        <div className="courses-search">
+
+          <span>
+            🔍
+          </span>
 
           <input
             type="text"
             placeholder="Search courses..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
           />
 
           {search && (
             <button
               type="button"
-              onClick={() => setSearch("")}
+              onClick={() =>
+                setSearch("")
+              }
               aria-label="Clear search"
             >
               ×
             </button>
           )}
+
         </div>
 
-        <div className="sc-filter">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={
-                activeCategory === category
-                  ? "active"
-                  : ""
-              }
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
       </section>
 
-      <section className="sc-section">
-        <div className="sc-section-head">
+      {/* =================================
+          COURSE GRID
+      ================================= */}
+
+      <section className="courses-content">
+
+        <div className="courses-heading">
+
           <div>
-            <span>YOUR COURSES</span>
+            <span>
+              YOUR COURSES
+            </span>
+
             <h2>
-              {activeCategory === "All"
-                ? "All Courses"
-                : activeCategory}
+              Continue Your Learning
             </h2>
           </div>
 
           <p>
-            {filteredCourses.length} course
-            {filteredCourses.length !== 1 ? "s" : ""}
+            {loading
+              ? "Loading..."
+              : `${filteredCourses.length} course${
+                  filteredCourses.length !== 1
+                    ? "s"
+                    : ""
+                } found`}
           </p>
+
         </div>
 
-        {filteredCourses.length > 0 ? (
-          <div className="sc-grid">
-            {filteredCourses.map((course) => (
-              <article className="sc-course-card" key={course.id}>
-                <div className="sc-card-top">
-                  <div className="sc-course-icon">
-                    {course.icon}
-                  </div>
+        {/* =================================
+            LOADING
+        ================================= */}
 
-                  <span className="sc-category">
-                    {course.category}
-                  </span>
-                </div>
+        {loading ? (
 
-                <div className="sc-card-body">
-                  <h3>{course.title}</h3>
+          <div className="courses-empty">
 
-                  <p>{course.description}</p>
+            <div className="courses-empty-icon">
+              ⏳
+            </div>
 
-                  <div className="sc-meta">
-                    <span>▣ {course.lessons} Lessons</span>
-                    <span>◷ {course.duration}</span>
-                  </div>
+            <h3>
+              Loading courses...
+            </h3>
 
-                  <div className="sc-level">
-                    <span>{course.level}</span>
-                    <strong>{course.progress}%</strong>
-                  </div>
-
-                  <div className="sc-progress">
-                    <div
-                      style={{
-                        width: `${course.progress}%`,
-                      }}
-                    ></div>
-                  </div>
-
-                  <div className="sc-card-bottom">
-                    <small>
-                      {course.completed} of {course.lessons} completed
-                    </small>
-
-                    <Link
-                      to="/student/learning"
-                      className={
-                        course.progress > 0
-                          ? "sc-continue"
-                          : "sc-start"
-                      }
-                    >
-                      {course.progress > 0
-                        ? "Continue"
-                        : "Start Learning"}
-                      <span>→</span>
-                    </Link>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="sc-empty">
-            <div>⌕</div>
-            <h3>No courses found</h3>
             <p>
-              Try another search term or choose a different category.
+              COLLEGIYA से courses load हो रहे हैं।
+            </p>
+
+          </div>
+
+        ) : filteredCourses.length > 0 ? (
+
+          <div className="courses-grid">
+
+            {filteredCourses.map(
+              (course) => (
+
+                <article
+                  className={`course-card course-${course.color}`}
+                  key={course.id}
+                >
+
+                  {/* CARD TOP */}
+
+                  <div className="course-card-top">
+
+                    <div className="course-card-icon">
+
+                      {course.thumbnail ? (
+
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          onError={(event) => {
+                            event.currentTarget.onerror =
+                              null;
+
+                            event.currentTarget.src =
+                              DEFAULT_THUMBNAIL;
+                          }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "inherit",
+                          }}
+                        />
+
+                      ) : (
+
+                        course.icon
+
+                      )}
+
+                    </div>
+
+                    <span className="course-status">
+                      {course.status}
+                    </span>
+
+                  </div>
+
+                  {/* TITLE */}
+
+                  <div className="course-card-body">
+
+                    <div className="course-card-tags">
+
+                      <span>
+                        {course.category}
+                      </span>
+
+                      <span>
+                        {course.level}
+                      </span>
+
+                    </div>
+
+                    <h3>
+                      {course.title}
+                    </h3>
+
+                    <p>
+                      {course.description}
+                    </p>
+
+                    <div className="course-instructor">
+
+                      <div className="course-instructor-avatar">
+                        C
+                      </div>
+
+                      <span>
+                        {course.instructor}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                  {/* PROGRESS */}
+
+                  <div className="course-progress-area">
+
+                    <div className="course-progress-info">
+
+                      <span>
+                        Your Progress
+                      </span>
+
+                      <strong>
+                        {course.progress}%
+                      </strong>
+
+                    </div>
+
+                    <div className="course-progress-bar">
+
+                      <span
+                        style={{
+                          width: `${course.progress}%`,
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+
+                  {/* META */}
+
+                  <div className="course-meta">
+
+                    <span>
+                      📖 {course.lessons} Lessons
+                    </span>
+
+                    <span>
+                      ⏱ {course.hours}
+                    </span>
+
+                  </div>
+
+                  {/* ACTION */}
+
+                  <Link
+                    to={`/student/learning?course=${course.id}`}
+                    className="course-action"
+                  >
+                    {course.progress === 100
+                      ? "Review Course"
+                      : course.progress === 0
+                      ? "Start Course"
+                      : "Continue Learning"}
+
+                    <span>
+                      →
+                    </span>
+                  </Link>
+
+                </article>
+
+              )
+            )}
+
+          </div>
+
+        ) : (
+
+          <div className="courses-empty">
+
+            <div className="courses-empty-icon">
+              🔎
+            </div>
+
+            <h3>
+              No courses found
+            </h3>
+
+            <p>
+              Search बदलें या कोई दूसरा course filter चुनें।
             </p>
 
             <button
               type="button"
               onClick={() => {
                 setSearch("");
-                setActiveCategory("All");
+                setActiveFilter(
+                  "All Courses"
+                );
               }}
             >
-              View All Courses
+              Show All Courses
             </button>
+
           </div>
+
         )}
+
       </section>
 
-      <section className="sc-bottom-banner">
-        <div className="sc-bottom-icon">
-          <img src="/logo.jpg" alt="Collegiya" />
+      {/* =================================
+          LEARNING TIP
+      ================================= */}
+
+      <section className="courses-tip">
+
+        <div className="courses-tip-icon">
+          💡
         </div>
 
-        <div className="sc-bottom-content">
-          <span>KEEP MOVING FORWARD</span>
+        <div className="courses-tip-content">
 
-          <h2>
-            Your next skill starts here.
-          </h2>
+          <span>
+            LEARNING TIP
+          </span>
+
+          <h3>
+            रोज थोड़ा सीखें, लगातार आगे बढ़ें।
+          </h3>
 
           <p>
-            Learn consistently, complete lessons and grow every day.
+            एक साथ बहुत कुछ करने के बजाय रोज 30–60 मिनट
+            focused learning आपकी progress को बेहतर बना सकती है।
           </p>
+
         </div>
 
         <Link
           to="/student/learning"
-          className="sc-bottom-button"
+          className="courses-tip-button"
         >
-          Continue Learning →
+          Start Learning →
         </Link>
+
       </section>
+
     </div>
   );
 }

@@ -5,20 +5,14 @@ import MainLayout from "./layouts/MainLayout";
 import StudentLayout from "./layouts/StudentLayout";
 import TeacherLayout from "./layouts/TeacherLayout";
 
-// =========================
-// PUBLIC
-// =========================
-
+// Public Pages
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
 import Learning from "./pages/Learning";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
-// =========================
-// STUDENT
-// =========================
-
+// Student Portal
 import StudentDashboard from "./student/Dashboard";
 import StudentCourses from "./student/Courses";
 import StudentLearning from "./student/Learning";
@@ -27,10 +21,7 @@ import StudentNotification from "./student/Notification";
 import StudentProfile from "./student/Profile";
 import StudentCertificate from "./student/Certificate";
 
-// =========================
-// TEACHER
-// =========================
-
+// Teacher Portal
 import TeacherDashboard from "./teacher/Dashboard";
 import TeacherCourses from "./teacher/Courses";
 import TeacherLectures from "./teacher/Lectures";
@@ -42,58 +33,36 @@ import TeacherEarnings from "./teacher/Earnings";
 import TeacherProfile from "./teacher/Profile";
 import TeacherSettings from "./teacher/Settings";
 
+// Blog
+import BlogHome from "./blog/BlogHome";
+import BlogDetails from "./blog/BlogDetails";
 
 export default function App() {
   return (
     <Routes>
 
-      {/* =================================
+      {/* ================================
           PUBLIC WEBSITE
       ================================= */}
 
       <Route element={<MainLayout />}>
-
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
-        <Route
-          path="/courses"
-          element={<Courses />}
-        />
-
-        <Route
-          path="/learning"
-          element={<Learning />}
-        />
-
-        <Route
-          path="/login"
-          element={<Login />}
-        />
-
-        <Route
-          path="/signup"
-          element={<Signup />}
-        />
-
+        <Route path="/" element={<Home />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/learning" element={<Learning />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/blog" element={<BlogHome />} />
+        <Route path="/blog/:slug" element={<BlogDetails />} />
       </Route>
 
 
-      {/* =================================
+      {/* ================================
           STUDENT PORTAL
       ================================= */}
 
-      <Route
-        path="/student"
-        element={<StudentLayout />}
-      >
+      <Route path="/student" element={<StudentLayout />}>
 
-        <Route
-          index
-          element={<StudentDashboard />}
-        />
+        <Route index element={<StudentDashboard />} />
 
         <Route
           path="dashboard"
@@ -143,14 +112,11 @@ export default function App() {
       </Route>
 
 
-      {/* =================================
+      {/* ================================
           TEACHER PORTAL
       ================================= */}
 
-      <Route
-        path="/teacher"
-        element={<TeacherLayout />}
-      >
+      <Route path="/teacher" element={<TeacherLayout />}>
 
         <Route
           index
