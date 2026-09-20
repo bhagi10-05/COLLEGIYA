@@ -1,245 +1,359 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Signup.css";
+import "./signup.css";
 
 export default function Signup() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
+
+  const [form, setForm] = useState({
     fullName: "",
     email: "",
     role: "Student",
     password: "",
     confirmPassword: "",
+    terms: false,
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agree, setAgree] = useState(false);
-  const [error, setError] = useState("");
+  const updateForm = (e) => {
+    const { name, value, type, checked } = e.target;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+    setForm((old) => ({
+      ...old,
+      [name]: type === "checkbox" ? checked : value,
     }));
-
-    setError("");
   };
 
-  const handleSubmit = (e) => {
+  const submitSignup = (e) => {
     e.preventDefault();
 
-    if (!formData.fullName.trim()) {
-      setError("Please enter your full name.");
+    const fullName = form.fullName.trim();
+    const email = form.email.trim().toLowerCase();
+
+    if (!fullName) {
+      alert("Please enter your full name.");
       return;
     }
 
-    if (!formData.email.trim()) {
-      setError("Please enter your email address.");
+    if (!email) {
+      alert("Please enter your email.");
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must contain at least 6 characters.");
+    if (!form.password) {
+      alert("Please enter your password.");
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match.");
+    if (form.password.length < 8) {
+      alert(
+        "Password must be at least 8 characters."
+      );
       return;
     }
 
-    if (!agree) {
-      setError("Please accept the Terms & Conditions.");
+    if (!/[A-Z]/.test(form.password)) {
+      alert(
+        "Password must contain at least one uppercase letter."
+      );
       return;
     }
 
-    // Temporary signup action
-    // Backend/Firebase can be connected here later.
-    alert("Account created successfully!");
+    if (!/[a-z]/.test(form.password)) {
+      alert(
+        "Password must contain at least one lowercase letter."
+      );
+      return;
+    }
+
+    if (!/[0-9]/.test(form.password)) {
+      alert(
+        "Password must contain at least one number."
+      );
+      return;
+    }
+
+    if (
+      form.password !== form.confirmPassword
+    ) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    if (!form.terms) {
+      alert(
+        "Please accept the terms and conditions."
+      );
+      return;
+    }
+
+    const existingUser = localStorage.getItem(
+      "collegiya_registered_user"
+    );
+
+    if (existingUser) {
+      try {
+        const user = JSON.parse(existingUser);
+
+        if (
+          user.email &&
+          user.email.toLowerCase() === email
+        ) {
+          alert(
+            "An account with this email already exists. Please login."
+          );
+
+          navigate("/login");
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const newUser = {
+      fullName,
+      email,
+      role: form.role || "Student",
+      password: form.password,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(
+      "collegiya_registered_user",
+      JSON.stringify(newUser)
+    );
+
+    /*
+      Signup does NOT automatically log the user in.
+      The user must login with the registered
+      email and password.
+    */
+
+    localStorage.removeItem(
+      "collegiya_student_token"
+    );
+
+    localStorage.removeItem(
+      "collegiya_student_user"
+    );
+
+    alert(
+      "Account created successfully! Please login to continue."
+    );
 
     navigate("/login");
   };
 
   return (
-    <div className="signup-page">
+    <main className="signup-screen">
 
-      <div className="signup-card">
+      <div className="signup-wrapper">
 
-        {/* ================= LEFT PANEL ================= */}
-        <div className="signup-left">
+        {/* BRAND */}
 
-          <img
-            src="/logo.jpg"
-            alt="Collegiya"
+        <section className="signup-brand-panel">
+
+          <div className="signup-decoration signup-decoration-one" />
+
+          <div className="signup-decoration signup-decoration-two" />
+
+          <Link
+            to="/"
             className="signup-brand-logo"
-          />
-
-          <div className="left-content">
-
-            <div className="signup-badge">
-              LEARN • GROW • ACHIEVE
-            </div>
-
-            <h1>
-              Start your
-              <span> learning journey.</span>
-            </h1>
-
-            <p>
-              Join Collegiya and explore courses, learning resources,
-              tests, career guidance and much more.
-            </p>
-
-            <div className="benefits">
-
-              <div className="benefit-item">
-                <div className="benefit-icon">✓</div>
-                <div>
-                  <strong>Learn at your pace</strong>
-                  <small>
-                    Access your learning journey anytime.
-                  </small>
-                </div>
-              </div>
-
-              <div className="benefit-item">
-                <div className="benefit-icon">✓</div>
-                <div>
-                  <strong>Prepare for your future</strong>
-                  <small>
-                    Courses, tests and career resources.
-                  </small>
-                </div>
-              </div>
-
-              <div className="benefit-item">
-                <div className="benefit-icon">✓</div>
-                <div>
-                  <strong>Track your progress</strong>
-                  <small>
-                    Keep your learning journey organized.
-                  </small>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-
-        {/* ================= RIGHT PANEL ================= */}
-        <div className="signup-right">
-
-          {/* Mobile Logo */}
-          <div className="mobile-logo-box">
+          >
             <img
               src="/logo.jpg"
               alt="Collegiya"
             />
-          </div>
+          </Link>
 
-          {/* Header */}
-          <div className="signup-header">
+          <div className="signup-brand-content">
 
-            <div className="header-label">
-              CREATE ACCOUNT
+            <div className="signup-brand-badge">
+              <span />
+              JOIN COLLEGIYA
             </div>
 
-            <h2>
-              Join Collegiya
-            </h2>
+            <h1>
+              Start.
+              <br />
+              Learn.
+              <br />
+              <strong>Grow.</strong>
+            </h1>
 
             <p>
-              Create your account and start your journey.
+              Create your Collegiya account and
+              start your learning journey.
             </p>
+
+            <div className="signup-brand-features">
+
+              <div className="signup-feature">
+
+                <div className="signup-feature-icon">
+                  ✓
+                </div>
+
+                <div>
+                  <strong>
+                    Structured Learning
+                  </strong>
+
+                  <span>
+                    Learn at your own pace
+                  </span>
+                </div>
+
+              </div>
+
+              <div className="signup-feature">
+
+                <div className="signup-feature-icon">
+                  ◈
+                </div>
+
+                <div>
+                  <strong>
+                    Courses & Practice
+                  </strong>
+
+                  <span>
+                    Learn and test your skills
+                  </span>
+                </div>
+
+              </div>
+
+              <div className="signup-feature">
+
+                <div className="signup-feature-icon">
+                  ★
+                </div>
+
+                <div>
+                  <strong>
+                    Track Your Progress
+                  </strong>
+
+                  <span>
+                    Keep improving every day
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
 
           </div>
 
+          <div className="signup-brand-footer">
+            <span>Learn Better.</span>
+            <span>Grow Smarter.</span>
+          </div>
 
-          {/* Form */}
-          <form
-            className="signup-form"
-            onSubmit={handleSubmit}
-          >
+        </section>
 
-            {/* Full Name */}
-            <div className="form-group">
 
-              <label htmlFor="fullName">
-                Full name
-              </label>
+        {/* SIGNUP FORM */}
 
-              <div className="input-box">
+        <section className="signup-form-panel">
 
-                <span className="input-icon">
-                  ♙
-                </span>
+          <div className="signup-form-container">
+
+            <div className="signup-mobile-logo">
+
+              <Link to="/">
+                <img
+                  src="/logo.jpg"
+                  alt="Collegiya"
+                />
+              </Link>
+
+            </div>
+
+
+            <div className="signup-title">
+
+              <span className="signup-title-label">
+                CREATE ACCOUNT
+              </span>
+
+              <h2>
+                Join Collegiya
+              </h2>
+
+              <p>
+                Create your account to start learning.
+              </p>
+
+            </div>
+
+
+            <form
+              className="signup-form"
+              onSubmit={submitSignup}
+            >
+
+              {/* NAME */}
+
+              <div className="signup-group">
+
+                <label htmlFor="signup-name">
+                  Full name
+                </label>
 
                 <input
-                  id="fullName"
+                  id="signup-name"
                   name="fullName"
                   type="text"
                   placeholder="Enter your full name"
-                  value={formData.fullName}
-                  onChange={handleChange}
+                  value={form.fullName}
+                  onChange={updateForm}
                   autoComplete="name"
                 />
 
               </div>
 
-            </div>
 
+              {/* EMAIL */}
 
-            {/* Email */}
-            <div className="form-group">
+              <div className="signup-group">
 
-              <label htmlFor="email">
-                Email address
-              </label>
-
-              <div className="input-box">
-
-                <span className="input-icon">
-                  ✉
-                </span>
+                <label htmlFor="signup-email">
+                  Email address
+                </label>
 
                 <input
-                  id="email"
+                  id="signup-email"
                   name="email"
                   type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={updateForm}
                   autoComplete="email"
                 />
 
               </div>
 
-            </div>
 
+              {/* ROLE */}
 
-            {/* Role */}
-            <div className="form-group">
+              <div className="signup-group">
 
-              <label htmlFor="role">
-                I am a
-              </label>
-
-              <div className="input-box select-box">
-
-                <span className="input-icon">
-                  ☷
-                </span>
+                <label htmlFor="signup-role">
+                  Account type
+                </label>
 
                 <select
-                  id="role"
+                  id="signup-role"
                   name="role"
-                  value={formData.role}
-                  onChange={handleChange}
+                  value={form.role}
+                  onChange={updateForm}
                 >
                   <option value="Student">
                     Student
@@ -254,185 +368,181 @@ export default function Signup() {
                   </option>
                 </select>
 
-                <span className="select-arrow">
-                  ▾
-                </span>
+              </div>
+
+
+              {/* PASSWORD */}
+
+              <div className="signup-group">
+
+                <label htmlFor="signup-password">
+                  Password
+                </label>
+
+                <div className="signup-password-input">
+
+                  <input
+                    id="signup-password"
+                    name="password"
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Create a strong password"
+                    value={form.password}
+                    onChange={updateForm}
+                    autoComplete="new-password"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword(
+                        (old) => !old
+                      )
+                    }
+                  >
+                    {showPassword
+                      ? "Hide"
+                      : "Show"}
+                  </button>
+
+                </div>
 
               </div>
 
-            </div>
+
+              {/* CONFIRM PASSWORD */}
+
+              <div className="signup-group">
+
+                <label htmlFor="signup-confirm-password">
+                  Confirm password
+                </label>
+
+                <div className="signup-password-input">
+
+                  <input
+                    id="signup-confirm-password"
+                    name="confirmPassword"
+                    type={
+                      showConfirmPassword
+                        ? "text"
+                        : "password"
+                    }
+                    placeholder="Confirm your password"
+                    value={
+                      form.confirmPassword
+                    }
+                    onChange={updateForm}
+                    autoComplete="new-password"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowConfirmPassword(
+                        (old) => !old
+                      )
+                    }
+                  >
+                    {showConfirmPassword
+                      ? "Hide"
+                      : "Show"}
+                  </button>
+
+                </div>
+
+              </div>
 
 
-            {/* Password */}
-            <div className="form-group">
+              {/* TERMS */}
 
-              <label htmlFor="password">
-                Password
-              </label>
-
-              <div className="input-box">
-
-                <span className="input-icon">
-                  ●
-                </span>
+              <label className="signup-terms">
 
                 <input
-                  id="password"
-                  name="password"
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  autoComplete="new-password"
+                  type="checkbox"
+                  name="terms"
+                  checked={form.terms}
+                  onChange={updateForm}
                 />
 
-                <button
-                  type="button"
-                  className="password-button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  aria-label="Show password"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-
-              </div>
-
-              <small className="input-help">
-                Minimum 6 characters
-              </small>
-
-            </div>
-
-
-            {/* Confirm Password */}
-            <div className="form-group">
-
-              <label htmlFor="confirmPassword">
-                Confirm password
-              </label>
-
-              <div className="input-box">
-
-                <span className="input-icon">
-                  ●
+                <span>
+                  I agree to the terms and conditions.
                 </span>
 
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  autoComplete="new-password"
-                />
+              </label>
 
-                <button
-                  type="button"
-                  className="password-button"
-                  onClick={() =>
-                    setShowConfirmPassword(
-                      !showConfirmPassword
-                    )
-                  }
-                  aria-label="Show confirm password"
+
+              {/* CREATE ACCOUNT */}
+
+              <button
+                type="submit"
+                className="signup-button"
+              >
+
+                <span>
+                  Create Account
+                </span>
+
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
-                  {showConfirmPassword
-                    ? "Hide"
-                    : "Show"}
-                </button>
+                  <path d="M5 12h14" />
+                  <path d="M13 6l6 6-6 6" />
+                </svg>
 
-              </div>
+              </button>
+
+            </form>
+
+
+            {/* LOGIN */}
+
+            <div className="signup-login">
+
+              <span>
+                Already have an account?
+              </span>
+
+              <Link to="/login">
+                Sign in
+              </Link>
 
             </div>
 
 
-            {/* Terms */}
-            <label className="terms">
+            <div className="signup-secure">
 
-              <input
-                type="checkbox"
-                checked={agree}
-                onChange={(e) =>
-                  setAgree(e.target.checked)
-                }
-              />
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <rect
+                  x="5"
+                  y="10"
+                  width="14"
+                  height="10"
+                  rx="2"
+                />
+
+                <path d="M8 10V7a4 4 0 018 0v3" />
+              </svg>
 
               <span>
-                I agree to the{" "}
-                <a href="#terms">
-                  Terms & Conditions
-                </a>{" "}
-                and{" "}
-                <a href="#privacy">
-                  Privacy Policy
-                </a>.
+                Secure account • Collegiya
               </span>
 
-            </label>
-
-
-            {/* Error */}
-            {error && (
-              <div className="signup-error">
-                {error}
-              </div>
-            )}
-
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="signup-submit"
-            >
-              <span>
-                Create Account
-              </span>
-
-              <b>
-                →
-              </b>
-            </button>
-
-          </form>
-
-
-          {/* Login */}
-          <div className="already-account">
-
-            <span>
-              Already have an account?
-            </span>
-
-            <Link to="/login">
-              Login
-            </Link>
+            </div>
 
           </div>
 
-
-          {/* Security */}
-          <div className="security-note">
-            <span>🔒</span>
-            <span>
-              Your information is secure with Collegiya.
-            </span>
-          </div>
-
-        </div>
+        </section>
 
       </div>
 
-    </div>
+    </main>
   );
 }

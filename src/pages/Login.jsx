@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -25,20 +26,69 @@ export default function Login() {
   const submitLogin = (e) => {
     e.preventDefault();
 
-    if (!form.email.trim()) {
+    const email = form.email.trim().toLowerCase();
+    const password = form.password;
+
+    if (!email) {
       alert("Please enter your email.");
       return;
     }
 
-    if (!form.password.trim()) {
+    if (!password.trim()) {
       alert("Please enter your password.");
       return;
     }
 
     /*
-      Existing login flow is preserved.
-      A local student session is created only
-      after the existing validation succeeds.
+      Check whether the student has created
+      an account through Signup.
+    */
+
+    const registeredUser = localStorage.getItem(
+      "collegiya_registered_user"
+    );
+
+    if (!registeredUser) {
+      alert(
+        "Account not found. Please create an account first."
+      );
+      navigate("/signup");
+      return;
+    }
+
+    let user;
+
+    try {
+      user = JSON.parse(registeredUser);
+    } catch (error) {
+      console.error(error);
+
+      localStorage.removeItem(
+        "collegiya_registered_user"
+      );
+
+      alert(
+        "Your account data is invalid. Please sign up again."
+      );
+
+      navigate("/signup");
+      return;
+    }
+
+    if (
+      !user.email ||
+      !user.password ||
+      user.email.toLowerCase() !== email ||
+      user.password !== password
+    ) {
+      alert(
+        "Invalid email or password. Please check your details."
+      );
+      return;
+    }
+
+    /*
+      Login successful.
     */
 
     const loginToken =
@@ -50,7 +100,19 @@ export default function Login() {
       loginToken
     );
 
-    navigate("/student/dashboard");
+    localStorage.setItem(
+      "collegiya_student_user",
+      JSON.stringify({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        role: user.role || "Student",
+      })
+    );
+
+    const destination =
+      location.state?.from || "/student/dashboard";
+
+    navigate(destination, { replace: true });
   };
 
   return (
@@ -171,8 +233,6 @@ export default function Login() {
 
           <div className="login-form-container">
 
-            {/* MOBILE LOGO */}
-
             <div className="login-mobile-logo">
 
               <Link to="/">
@@ -183,9 +243,6 @@ export default function Login() {
               </Link>
 
             </div>
-
-
-            {/* HEADING */}
 
             <div className="login-title">
 
@@ -204,14 +261,10 @@ export default function Login() {
             </div>
 
 
-            {/* FORM */}
-
             <form
               className="login-form"
               onSubmit={submitLogin}
             >
-
-              {/* EMAIL */}
 
               <div className="login-group">
 
@@ -250,8 +303,6 @@ export default function Login() {
 
               </div>
 
-
-              {/* PASSWORD */}
 
               <div className="login-group">
 
@@ -324,8 +375,6 @@ export default function Login() {
               </div>
 
 
-              {/* REMEMBER */}
-
               <label className="login-remember">
 
                 <input
@@ -341,8 +390,6 @@ export default function Login() {
 
               </label>
 
-
-              {/* LOGIN BUTTON */}
 
               <button
                 type="submit"
@@ -366,14 +413,10 @@ export default function Login() {
             </form>
 
 
-            {/* DIVIDER */}
-
             <div className="login-divider">
               <span>OR</span>
             </div>
 
-
-            {/* GOOGLE */}
 
             <button
               type="button"
@@ -394,8 +437,6 @@ export default function Login() {
             </button>
 
 
-            {/* SIGNUP */}
-
             <div className="login-signup">
 
               <span>
@@ -408,8 +449,6 @@ export default function Login() {
 
             </div>
 
-
-            {/* SECURITY */}
 
             <div className="login-secure">
 
