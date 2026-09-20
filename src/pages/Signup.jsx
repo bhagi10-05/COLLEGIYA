@@ -9,13 +9,8 @@ const API_BASE =
 export default function Signup() {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] =
-    useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
-
-  const [loading, setLoading] =
     useState(false);
 
   const [form, setForm] = useState({
@@ -28,51 +23,32 @@ export default function Signup() {
   });
 
   const updateForm = (e) => {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = e.target;
+    const { name, value, type, checked } = e.target;
 
     setForm((old) => ({
       ...old,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const submitSignup = async (e) => {
     e.preventDefault();
 
-    if (loading) return;
-
-    const fullName =
-      form.fullName.trim();
-
-    const email =
-      form.email.trim().toLowerCase();
+    const fullName = form.fullName.trim();
+    const email = form.email.trim().toLowerCase();
 
     if (!fullName) {
-      alert(
-        "Please enter your full name."
-      );
+      alert("Please enter your full name.");
       return;
     }
 
     if (!email) {
-      alert(
-        "Please enter your email."
-      );
+      alert("Please enter your email.");
       return;
     }
 
     if (!form.password) {
-      alert(
-        "Please enter your password."
-      );
+      alert("Please enter your password.");
       return;
     }
 
@@ -105,12 +81,9 @@ export default function Signup() {
     }
 
     if (
-      form.password !==
-      form.confirmPassword
+      form.password !== form.confirmPassword
     ) {
-      alert(
-        "Passwords do not match."
-      );
+      alert("Passwords do not match.");
       return;
     }
 
@@ -121,8 +94,6 @@ export default function Signup() {
       return;
     }
 
-    // Student authentication is currently
-    // connected to the Student backend model.
     if (form.role !== "Student") {
       alert(
         "Currently only Student accounts can be created."
@@ -131,37 +102,37 @@ export default function Signup() {
     }
 
     try {
-      setLoading(true);
-
       const response = await fetch(
         `${API_BASE}/auth/student/signup`,
         {
           method: "POST",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             name: fullName,
             email,
-            password:
-              form.password,
+            password: form.password,
           }),
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
+        alert(
           data.message ||
             "Unable to create account."
         );
+        return;
       }
 
-      // Signup does NOT automatically
-      // log the student in.
+      /*
+        Signup does NOT automatically log the user in.
+        The user must login with the registered
+        email and password.
+      */
+
       localStorage.removeItem(
         "collegiya_student_token"
       );
@@ -174,34 +145,19 @@ export default function Signup() {
         "Account created successfully! Please login to continue."
       );
 
-      navigate("/login", {
-        replace: true,
-      });
+      navigate("/login");
     } catch (error) {
-      console.error(
-        "Signup Error:",
-        error
-      );
+      console.error("Signup Error:", error);
 
-      if (
-        error instanceof TypeError
-      ) {
-        alert(
-          "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
-        );
-      } else {
-        alert(
-          error.message ||
-            "Signup failed. Please try again."
-        );
-      }
-    } finally {
-      setLoading(false);
+      alert(
+        "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
+      );
     }
   };
 
   return (
     <main className="signup-screen">
+
       <div className="signup-wrapper">
 
         {/* BRAND */}
@@ -245,6 +201,7 @@ export default function Signup() {
             <div className="signup-brand-features">
 
               <div className="signup-feature">
+
                 <div className="signup-feature-icon">
                   ✓
                 </div>
@@ -258,6 +215,7 @@ export default function Signup() {
                     Learn at your own pace
                   </span>
                 </div>
+
               </div>
 
               <div className="signup-feature">
@@ -268,11 +226,11 @@ export default function Signup() {
 
                 <div>
                   <strong>
-                    Courses & Practice
+                    Expert Content
                   </strong>
 
                   <span>
-                    Learn and test your skills
+                    Learn from quality resources
                   </span>
                 </div>
 
@@ -286,11 +244,11 @@ export default function Signup() {
 
                 <div>
                   <strong>
-                    Track Your Progress
+                    Track Progress
                   </strong>
 
                   <span>
-                    Keep improving every day
+                    See your learning growth
                   </span>
                 </div>
 
@@ -301,46 +259,39 @@ export default function Signup() {
           </div>
 
           <div className="signup-brand-footer">
-            <span>
-              Learn Better.
-            </span>
-
-            <span>
-              Grow Smarter.
-            </span>
+            © {new Date().getFullYear()} COLLEGIYA
           </div>
 
         </section>
 
-        {/* SIGNUP FORM */}
+        {/* FORM */}
 
         <section className="signup-form-panel">
 
+          <div className="signup-mobile-logo">
+            <Link to="/">
+              <img
+                src="/logo.jpg"
+                alt="Collegiya"
+              />
+            </Link>
+          </div>
+
           <div className="signup-form-container">
-
-            <div className="signup-mobile-logo">
-
-              <Link to="/">
-                <img
-                  src="/logo.jpg"
-                  alt="Collegiya"
-                />
-              </Link>
-
-            </div>
 
             <div className="signup-title">
 
-              <span className="signup-title-label">
+              <span>
                 CREATE ACCOUNT
               </span>
 
               <h2>
-                Join Collegiya
+                Begin your journey.
               </h2>
 
               <p>
-                Create your account to start learning.
+                Create your account and unlock
+                the Collegiya learning experience.
               </p>
 
             </div>
@@ -350,62 +301,53 @@ export default function Signup() {
               onSubmit={submitSignup}
             >
 
-              {/* NAME */}
+              <div className="signup-field">
 
-              <div className="signup-group">
-
-                <label htmlFor="signup-name">
-                  Full name
+                <label htmlFor="fullName">
+                  Full Name
                 </label>
 
                 <input
-                  id="signup-name"
+                  id="fullName"
                   name="fullName"
                   type="text"
-                  placeholder="Enter your full name"
                   value={form.fullName}
                   onChange={updateForm}
+                  placeholder="Enter your full name"
                   autoComplete="name"
-                  disabled={loading}
                 />
 
               </div>
 
-              {/* EMAIL */}
+              <div className="signup-field">
 
-              <div className="signup-group">
-
-                <label htmlFor="signup-email">
-                  Email address
+                <label htmlFor="email">
+                  Email Address
                 </label>
 
                 <input
-                  id="signup-email"
+                  id="email"
                   name="email"
                   type="email"
-                  placeholder="you@example.com"
                   value={form.email}
                   onChange={updateForm}
+                  placeholder="Enter your email"
                   autoComplete="email"
-                  disabled={loading}
                 />
 
               </div>
 
-              {/* ROLE */}
+              <div className="signup-field">
 
-              <div className="signup-group">
-
-                <label htmlFor="signup-role">
-                  Account type
+                <label htmlFor="role">
+                  I am a
                 </label>
 
                 <select
-                  id="signup-role"
+                  id="role"
                   name="role"
                   value={form.role}
                   onChange={updateForm}
-                  disabled={loading}
                 >
                   <option value="Student">
                     Student
@@ -422,84 +364,76 @@ export default function Signup() {
 
               </div>
 
-              {/* PASSWORD */}
+              <div className="signup-field">
 
-              <div className="signup-group">
-
-                <label htmlFor="signup-password">
+                <label htmlFor="password">
                   Password
                 </label>
 
-                <div className="signup-password-input">
+                <div className="signup-password-wrap">
 
                   <input
-                    id="signup-password"
+                    id="password"
                     name="password"
                     type={
                       showPassword
                         ? "text"
                         : "password"
                     }
-                    placeholder="Create a strong password"
                     value={form.password}
                     onChange={updateForm}
+                    placeholder="Create a strong password"
                     autoComplete="new-password"
-                    disabled={loading}
                   />
 
                   <button
                     type="button"
+                    className="signup-password-toggle"
                     onClick={() =>
                       setShowPassword(
-                        (old) => !old
+                        (value) => !value
                       )
                     }
-                    disabled={loading}
                   >
-                    {showPassword
-                      ? "Hide"
-                      : "Show"}
+                    {showPassword ? "Hide" : "Show"}
                   </button>
 
                 </div>
 
               </div>
 
-              {/* CONFIRM PASSWORD */}
+              <div className="signup-field">
 
-              <div className="signup-group">
-
-                <label htmlFor="signup-confirm-password">
-                  Confirm password
+                <label htmlFor="confirmPassword">
+                  Confirm Password
                 </label>
 
-                <div className="signup-password-input">
+                <div className="signup-password-wrap">
 
                   <input
-                    id="signup-confirm-password"
+                    id="confirmPassword"
                     name="confirmPassword"
                     type={
                       showConfirmPassword
                         ? "text"
                         : "password"
                     }
-                    placeholder="Confirm your password"
                     value={
                       form.confirmPassword
                     }
                     onChange={updateForm}
+                    placeholder="Confirm your password"
                     autoComplete="new-password"
-                    disabled={loading}
                   />
 
                   <button
                     type="button"
+                    className="signup-password-toggle"
                     onClick={() =>
                       setShowConfirmPassword(
-                        (old) => !old
+                        (value) => !value
                       )
                     }
-                    disabled={loading}
                   >
                     {showConfirmPassword
                       ? "Hide"
@@ -510,86 +444,55 @@ export default function Signup() {
 
               </div>
 
-              {/* TERMS */}
-
               <label className="signup-terms">
 
                 <input
-                  type="checkbox"
                   name="terms"
+                  type="checkbox"
                   checked={form.terms}
                   onChange={updateForm}
-                  disabled={loading}
                 />
 
                 <span>
-                  I agree to the terms and conditions.
+                  I agree to the{" "}
+                  <a
+                    href="#terms"
+                    onClick={(e) =>
+                      e.preventDefault()
+                    }
+                  >
+                    Terms & Conditions
+                  </a>{" "}
+                  and Privacy Policy.
                 </span>
 
               </label>
 
-              {/* CREATE ACCOUNT */}
-
               <button
                 type="submit"
-                className="signup-button"
-                disabled={loading}
+                className="signup-submit"
               >
-
-                <span>
-                  {loading
-                    ? "Creating Account..."
-                    : "Create Account"}
-                </span>
-
-                {!loading && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="M13 6l6 6-6 6" />
-                  </svg>
-                )}
-
+                Create Account
               </button>
 
             </form>
 
-            {/* LOGIN */}
-
             <div className="signup-login">
 
-              <span>
-                Already have an account?
-              </span>
+              Already have an account?{" "}
 
               <Link to="/login">
-                Sign in
+                Login
               </Link>
 
             </div>
 
             <div className="signup-secure">
 
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <rect
-                  x="5"
-                  y="10"
-                  width="14"
-                  height="10"
-                  rx="2"
-                />
+              <span>🔒</span>
 
-                <path d="M8 10V7a4 4 0 018 0v3" />
-              </svg>
-
-              <span>
-                Secure account • Collegiya
-              </span>
+              Your information is securely
+              protected.
 
             </div>
 
@@ -598,6 +501,7 @@ export default function Signup() {
         </section>
 
       </div>
+
     </main>
   );
 }
