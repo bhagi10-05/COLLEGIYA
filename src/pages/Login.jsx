@@ -17,8 +17,7 @@ export default function Login() {
   const [passwordVisible, setPasswordVisible] =
     useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     email: "",
@@ -27,19 +26,11 @@ export default function Login() {
   });
 
   const updateForm = (e) => {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = e.target;
+    const { name, value, type, checked } = e.target;
 
-    setForm((old) => ({
-      ...old,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -48,23 +39,16 @@ export default function Login() {
 
     if (loading) return;
 
-    const email =
-      form.email.trim().toLowerCase();
-
-    const password =
-      form.password;
+    const email = form.email.trim().toLowerCase();
+    const password = form.password;
 
     if (!email) {
-      alert(
-        "Please enter your email."
-      );
+      alert("Please enter your email.");
       return;
     }
 
     if (!password.trim()) {
-      alert(
-        "Please enter your password."
-      );
+      alert("Please enter your password.");
       return;
     }
 
@@ -76,8 +60,7 @@ export default function Login() {
         {
           method: "POST",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             email,
@@ -86,56 +69,35 @@ export default function Login() {
         }
       );
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        if (
-          response.status === 404 ||
-          response.status === 401
-        ) {
-          alert(
-            data.message ||
-              "Invalid email or password."
-          );
-        } else {
-          alert(
-            data.message ||
-              "Login failed. Please try again."
-          );
-        }
-
+        alert(
+          data.message ||
+            "Invalid email or password."
+        );
         return;
       }
 
-      if (
-        !data.token ||
-        !data.student
-      ) {
+      if (!data.token || !data.student) {
         alert(
           "Login response is invalid. Please try again."
         );
         return;
       }
 
-      // Store real JWT
       localStorage.setItem(
         "collegiya_student_token",
         data.token
       );
 
-      // Store only safe student information
       localStorage.setItem(
         "collegiya_student_user",
         JSON.stringify({
-          id:
-            data.student.id,
-          fullName:
-            data.student.name,
-          email:
-            data.student.email,
-          role:
-            data.student.role,
+          id: data.student.id,
+          fullName: data.student.name,
+          email: data.student.email,
+          role: data.student.role,
         })
       );
 
@@ -147,172 +109,110 @@ export default function Login() {
         replace: true,
       });
     } catch (error) {
-      console.error(
-        "Login Error:",
-        error
-      );
+      console.error("Login Error:", error);
 
-      if (
-        error instanceof TypeError
-      ) {
-        alert(
-          "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
-        );
-      } else {
-        alert(
-          "Login failed. Please try again."
-        );
-      }
+      alert(
+        "Unable to connect to COLLEGIYA server. Please make sure the backend is running."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="login-screen">
+    <main className="login-page">
 
-      <div className="login-wrapper">
+      <div className="login-card">
 
-        {/* LEFT BRAND AREA */}
+        {/* LEFT VISUAL PANEL */}
 
-        <section className="login-brand-panel">
+        <section className="login-visual">
 
-          <div className="login-decoration login-decoration-one" />
-
-          <div className="login-decoration login-decoration-two" />
-
-          <Link
-            to="/"
-            className="login-brand-logo"
-          >
+          <Link to="/" className="login-logo">
             <img
               src="/logo.jpg"
-              alt="Collegiya"
+              alt="COLLEGIYA"
             />
           </Link>
 
-          <div className="login-brand-content">
+          <div className="login-visual-content">
 
-            <div className="login-brand-badge">
-              <span />
-              LEARNING PLATFORM
+            <div className="login-eyebrow">
+              WELCOME BACK
             </div>
 
             <h1>
-              Learn.
+              Keep learning.
               <br />
-              Practice.
-              <br />
-              <strong>Grow.</strong>
+              <span>Keep growing.</span>
             </h1>
 
             <p>
-              Everything you need to learn new skills,
-              practice your knowledge and build your future
-              is waiting for you.
+              Your courses, learning progress,
+              quizzes and achievements are all
+              waiting for you.
             </p>
 
-            <div className="login-brand-features">
+            <div className="login-highlights">
 
-              <div className="login-feature">
-
-                <div className="login-feature-icon">
-                  ✓
-                </div>
-
-                <div>
-                  <strong>
-                    Structured Courses
-                  </strong>
-
-                  <span>
-                    Learn step by step
-                  </span>
-                </div>
-
+              <div>
+                <strong>01</strong>
+                <span>Continue your courses</span>
               </div>
 
-              <div className="login-feature">
-
-                <div className="login-feature-icon">
-                  ◈
-                </div>
-
-                <div>
-                  <strong>
-                    Practice & Quiz
-                  </strong>
-
-                  <span>
-                    Improve your knowledge
-                  </span>
-                </div>
-
+              <div>
+                <strong>02</strong>
+                <span>Practice with quizzes</span>
               </div>
 
-              <div className="login-feature">
-
-                <div className="login-feature-icon">
-                  ★
-                </div>
-
-                <div>
-                  <strong>
-                    Track Progress
-                  </strong>
-
-                  <span>
-                    See how far you have come
-                  </span>
-                </div>
-
+              <div>
+                <strong>03</strong>
+                <span>Track your progress</span>
               </div>
 
             </div>
 
           </div>
 
-          <div className="login-brand-footer">
+          <div className="login-visual-footer">
             <span>
-              Learn Better.
+              © {new Date().getFullYear()} COLLEGIYA
             </span>
 
             <span>
-              Grow Smarter.
+              Education for everyone
             </span>
           </div>
 
         </section>
 
-        {/* LOGIN AREA */}
+        {/* LOGIN PANEL */}
 
-        <section className="login-form-panel">
+        <section className="login-form-section">
+
+          <div className="login-mobile-logo">
+            <Link to="/">
+              <img
+                src="/logo.jpg"
+                alt="COLLEGIYA"
+              />
+            </Link>
+          </div>
 
           <div className="login-form-container">
-
-            <div className="login-mobile-logo">
-
-              <Link to="/">
-                <img
-                  src="/logo.jpg"
-                  alt="Collegiya"
-                />
-              </Link>
-
-            </div>
 
             <div className="login-title">
 
               <span className="login-title-label">
-                WELCOME BACK
+                SIGN IN
               </span>
 
               <h2>
-                Sign in to Collegiya
+                Welcome back.
               </h2>
 
               <p>
-                Enter your details to continue learning.
+                Login to continue your learning journey.
               </p>
 
             </div>
@@ -324,8 +224,8 @@ export default function Login() {
 
               <div className="login-group">
 
-                <label htmlFor="login-email">
-                  Email address
+                <label htmlFor="email">
+                  Email Address
                 </label>
 
                 <div className="login-input">
@@ -341,19 +241,17 @@ export default function Login() {
                       height="14"
                       rx="2"
                     />
-
-                    <path d="M3 7l9 6 9-6" />
+                    <path d="m3 7 9 6 9-6" />
                   </svg>
 
                   <input
-                    id="login-email"
+                    id="email"
                     name="email"
                     type="email"
-                    placeholder="you@example.com"
                     value={form.email}
                     onChange={updateForm}
+                    placeholder="you@example.com"
                     autoComplete="email"
-                    disabled={loading}
                   />
 
                 </div>
@@ -364,20 +262,21 @@ export default function Login() {
 
                 <div className="login-label-line">
 
-                  <label htmlFor="login-password">
+                  <label htmlFor="password">
                     Password
                   </label>
 
                   <button
                     type="button"
                     onClick={() =>
-                      alert(
-                        "Password reset will be connected with backend."
+                      setPasswordVisible(
+                        (value) => !value
                       )
                     }
-                    disabled={loading}
                   >
-                    Forgot password?
+                    {passwordVisible
+                      ? "Hide password"
+                      : "Show password"}
                   </button>
 
                 </div>
@@ -395,23 +294,21 @@ export default function Login() {
                       height="10"
                       rx="2"
                     />
-
-                    <path d="M8 10V7a4 4 0 018 0v3" />
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
                   </svg>
 
                   <input
-                    id="login-password"
+                    id="password"
                     name="password"
                     type={
                       passwordVisible
                         ? "text"
                         : "password"
                     }
-                    placeholder="Enter your password"
                     value={form.password}
                     onChange={updateForm}
+                    placeholder="Enter your password"
                     autoComplete="current-password"
-                    disabled={loading}
                   />
 
                   <button
@@ -419,10 +316,9 @@ export default function Login() {
                     className="login-password-button"
                     onClick={() =>
                       setPasswordVisible(
-                        (old) => !old
+                        (value) => !value
                       )
                     }
-                    disabled={loading}
                   >
                     {passwordVisible
                       ? "Hide"
@@ -433,52 +329,62 @@ export default function Login() {
 
               </div>
 
-              <label className="login-remember">
+              <div className="login-options">
 
-                <input
-                  type="checkbox"
-                  name="remember"
-                  checked={form.remember}
-                  onChange={updateForm}
-                  disabled={loading}
-                />
+                <label className="login-remember">
 
-                <span>
-                  Remember me
-                </span>
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    checked={form.remember}
+                    onChange={updateForm}
+                  />
 
-              </label>
+                  <span>
+                    Remember me
+                  </span>
+
+                </label>
+
+                <button
+                  type="button"
+                  className="login-forgot"
+                  onClick={() =>
+                    alert(
+                      "Password reset will be available soon."
+                    )
+                  }
+                >
+                  Forgot password?
+                </button>
+
+              </div>
 
               <button
                 type="submit"
                 className="login-button"
                 disabled={loading}
               >
-
                 <span>
                   {loading
-                    ? "Signing In..."
+                    ? "Signing in..."
                     : "Sign In"}
                 </span>
 
-                {!loading && (
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="M13 6l6 6-6 6" />
-                  </svg>
-                )}
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h13" />
+                  <path d="m13 6 6 6-6 6" />
+                </svg>
 
               </button>
 
             </form>
 
             <div className="login-divider">
-              <span>
-                OR
-              </span>
+              <span>OR</span>
             </div>
 
             <button
@@ -486,28 +392,25 @@ export default function Login() {
               className="login-google"
               onClick={() =>
                 alert(
-                  "Google authentication will be connected next."
+                  "Google login will be available soon."
                 )
               }
-              disabled={loading}
             >
-
               <span className="login-google-icon">
                 G
               </span>
 
               Continue with Google
-
             </button>
 
             <div className="login-signup">
 
               <span>
-                New to Collegiya?
+                Don't have an account?
               </span>
 
               <Link to="/signup">
-                Create an account
+                Create account
               </Link>
 
             </div>
@@ -525,13 +428,10 @@ export default function Login() {
                   height="10"
                   rx="2"
                 />
-
-                <path d="M8 10V7a4 4 0 018 0v3" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3" />
               </svg>
 
-              <span>
-                Secure login • Collegiya
-              </span>
+              Secure login • Your data is protected
 
             </div>
 
