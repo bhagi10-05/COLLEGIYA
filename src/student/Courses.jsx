@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import "./courses.css";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL || "https://collegiya-backend.onrender.com/api";
 
 const DEFAULT_THUMBNAIL = "/logo.jpg";
 

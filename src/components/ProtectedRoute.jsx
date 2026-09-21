@@ -11,7 +11,7 @@ import {
 
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL || "https://collegiya-backend.onrender.com/api";
 
 export default function ProtectedRoute() {
   const location =

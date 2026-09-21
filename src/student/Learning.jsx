@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import "./learning.css";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL || "https://collegiya-backend.onrender.com/api";
 
 const DEFAULT_VIDEO =
   "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
