@@ -122,7 +122,9 @@ export default function Login() {
       console.error("Student Login Error:", err);
 
       setError(
-        "Unable to connect to COLLEGIYA server. Please check your internet connection and try again."
+        err?.message
+          ? `Login connection error: ${err.message}`
+          : "Login connection error. Please try again."
       );
     } finally {
       setLoading(false);
